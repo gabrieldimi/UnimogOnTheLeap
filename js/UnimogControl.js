@@ -1,4 +1,10 @@
 window.addEventListener('DOMContentLoaded',function(){
+    var io = io();
+
+    io.on('translate', function(coord){
+        translate(globalUnimog,coord,null);
+    });
+    
     console.log("test");
     if (WEBGL.isWebGLAvailable() === false) {
 
@@ -105,6 +111,8 @@ window.addEventListener('DOMContentLoaded',function(){
         object.position.z += coord.z;
     }
 
+    
+    
     window.translate = translate;
 
 
