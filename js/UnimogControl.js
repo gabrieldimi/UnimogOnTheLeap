@@ -1,5 +1,5 @@
-window.addEventListener('DOMContentLoaded',function(){
     var io = io();
+window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translate', function(coord){
         translate(globalUnimog,coord,null);
@@ -23,12 +23,13 @@ window.addEventListener('DOMContentLoaded',function(){
     
         container = document.getElementById('render-box');
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 2000);
+		window.camera = camera
         scene = new THREE.Scene();
     
         // load unimog model
     
         var loader0 = new THREE.AssimpJSONLoader();
-        loader0.load('models/unimog.min.json', function (object) {
+        loader0.load('unimog.min.json', function (object) {
             globalUnimog = object;
             object.scale.multiplyScalar(0.02);
             scene.add(object);
@@ -49,11 +50,7 @@ window.addEventListener('DOMContentLoaded',function(){
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
-        test = {
-            "x": -8.071211969397641,
-            "y": 4,
-            "z": -5.903857835775881
-        }
+        test = {x: -0.21637741979625671, y: 8.833897368758429, z: 27.13939097042666}
         camera.position.z = test.z
         camera.position.y = test.y
         camera.position.x = test.x
@@ -103,12 +100,12 @@ window.addEventListener('DOMContentLoaded',function(){
         // var lowerRightX = coord.x + object.max;
         // var upperleftY = coord.y + object.max;
         // if(lowerRightX <= container.clientWidth && x >= 0 ){
-            object.position.x += coord.x;
+            object.position.x += coord.x / 1000;
         // }
         // if(upperleftY <= container.clientHeight && y >= 0 ){
-            object.position.y += coord.y;
+            object.position.y += coord.y / 1000;
         // }
-        object.position.z += coord.z;
+        object.position.z += coord.z / 1000;
     }
 
     
