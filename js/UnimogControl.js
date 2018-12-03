@@ -1,8 +1,20 @@
     var io = io();
 window.addEventListener('DOMContentLoaded',function(){
 
-    io.on('translate', function(coord){
-        translate(globalUnimog,coord,null);
+    io.on('translateModel', function(coord){
+        translateModel(coord,null);
+    });
+    
+    io.on('changeModel', function(model){
+        loadModel(model);
+    });
+
+    io.on('scaleModel', function(scaleValue){
+        scaleModel(scaleValue);
+    });
+
+    io.on('rotateModel', function(degree){
+        rotateModel(degree);
     });
     
     console.log("test");
@@ -28,13 +40,7 @@ window.addEventListener('DOMContentLoaded',function(){
     
         // load unimog model
     
-        var loader0 = new THREE.AssimpJSONLoader();
-        loader0.load('unimog.min.json', function (object) {
-            globalUnimog = object;
-            object.scale.multiplyScalar(0.02);
-            scene.add(object);
-    
-        });
+        loadModel('unimog.min.json');
 
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
@@ -95,22 +101,44 @@ window.addEventListener('DOMContentLoaded',function(){
     
     }
 
-    function translate(object,coord,container){
+    function translateModel(coord,container){
         // console.log(object.getSize())
         // var lowerRightX = coord.x + object.max;
         // var upperleftY = coord.y + object.max;
         // if(lowerRightX <= container.clientWidth && x >= 0 ){
-            object.position.x += coord.x / 1000;
+            globalUnimog.position.x += coord.x / 1000;
         // }
         // if(upperleftY <= container.clientHeight && y >= 0 ){
-            object.position.y += coord.y / 1000;
+            globalUnimog.position.y += coord.y / 1000;
         // }
-        object.position.z += coord.z / 1000;
+        globalUnimog.position.z += coord.z / 1000;
     }
 
+    function rotateModel(degree){
+        globalUnimog.rotation.z += Math.PI * (degree/100)/180;
+    }
+
+    function changeModel(nextModelUrl){
+        loadModel(nextModelUrl);
+    }
+
+    function loadModel(model){
+        var loader = new THREE.AssimpJSONLoader();
+        loader.load(model, function (object) {
+            window.globalUnimog = object;
+            object.scale.multiplyScalar(0.02);
+            scene.add(object);
+        });
+    }
+
+    function scaleModel(scaleValue){
+        scaleValue /= 100;
+        globalUnimog.scale.set(scaleValue,scaleValue,scaleValue);
+    }
     
     
     window.translate = translate;
-
+    window.rotation = rotation;
+    window.scaleModel = scaleModel;
 
 });
