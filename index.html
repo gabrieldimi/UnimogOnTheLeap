@@ -1,15 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" >
-  <head>
-    <meta charset="utf-8" />
-    <meta name="Julain Leuze" name="Gabriel Dimitrov"/>
-    <title>Unimog Musuem Simulator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link href="" rel="stylesheet" type="text/css" />
-  </head>
-  <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r99/three.min.js"></script> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script> 
-    <script src="js/UnimogControl.js" ></script>
-  </body>
+<html lang="en">
+	<head>
+		<title>Unimog Musuem Simulator</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<script src="js/three.min.js"></script>
+		<script src="js/AssimpJSONLoader.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/WebGL.js"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/UnimogControl.js"> </script>
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				
+			}
+		</style>
+		
+	</head>
+
+	<body>
+	<div id="render-box">
+
+  </div>
+	</body>
 </html>
