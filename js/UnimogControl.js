@@ -114,7 +114,7 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function rotateModel(radian){
-        globalUnimog.rotation.z += Math.PI * (degree/100)/180;
+        globalUnimog.rotation.z += Math.PI * (radian/100)/180;
     }
 
     function changeModel(nextModelUrl){
