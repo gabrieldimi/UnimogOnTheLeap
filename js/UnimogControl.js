@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded',function(){
     });
 
     io.on('rotateModel', function(radian){
-        rotateModel(degree);
+        rotateModel(radian);
     });
     
     if (WEBGL.isWebGLAvailable() === false) {
