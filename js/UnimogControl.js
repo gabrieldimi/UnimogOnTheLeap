@@ -13,11 +13,10 @@ window.addEventListener('DOMContentLoaded',function(){
         scaleModel(scaleValue);
     });
 
-    io.on('rotateModel', function(degree){
+    io.on('rotateModel', function(radian){
         rotateModel(degree);
     });
     
-    console.log("test");
     if (WEBGL.isWebGLAvailable() === false) {
 
         document.body.appendChild(WEBGL.getWebGLErrorMessage());
@@ -114,13 +113,21 @@ window.addEventListener('DOMContentLoaded',function(){
         globalUnimog.position.z += coord.z / 1000;
     }
 
-    function rotateModel(degree){
+    function rotateModel(radian){
         globalUnimog.rotation.z += Math.PI * (degree/100)/180;
     }
 
     function changeModel(nextModelUrl){
+        scene.remove(globalUnimog.name); 
         loadModel(nextModelUrl);
     }
+
+
+    function scaleModel(scaleValue){
+        scaleValue /= 100;
+        globalUnimog.scale.set(scaleValue,scaleValue,scaleValue);
+    }
+    
 
     function loadModel(model){
         var loader = new THREE.AssimpJSONLoader();
@@ -131,14 +138,6 @@ window.addEventListener('DOMContentLoaded',function(){
         });
     }
 
-    function scaleModel(scaleValue){
-        scaleValue /= 100;
-        globalUnimog.scale.set(scaleValue,scaleValue,scaleValue);
-    }
-    
-    
-    window.translate = translate;
-    window.rotation = rotation;
-    window.scaleModel = scaleModel;
+    window.scene = scene;
 
 });
