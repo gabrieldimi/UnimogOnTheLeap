@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded',function(){
     });
     
     io.on('changeModel', function(model){
-        loadModel(model);
+        changeModel(model);
     });
 
     io.on('scaleModel', function(scaleValue){
