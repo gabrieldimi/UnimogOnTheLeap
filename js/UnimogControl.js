@@ -118,7 +118,7 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function changeModel(nextModelUrl){
-        scene.remove(globalUnimog.name); 
+        scene.remove(globalUnimog); 
         loadModel(nextModelUrl);
     }
 
