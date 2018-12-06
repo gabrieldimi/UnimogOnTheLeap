@@ -1,0 +1,12 @@
+{
+  "grabStrength": 1,
+  "gesture": {
+    "swipe": {
+      "minLength": 100,
+      "MinVelocity": 1
+    },
+    "circle": {
+      "multiplier": 25
+    }
+  }
+}
