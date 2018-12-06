@@ -3,94 +3,103 @@ var io = io();
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
-    
+
     io.on('changeModel',changeModel);
 
     io.on('scaleModel',scaleModel);
 
     io.on('rotateModel', rotateModel);
-    
+
+    display = document.getElementById('displayPanel');
+
     if (WEBGL.isWebGLAvailable() === false) {
 
         document.body.appendChild(WEBGL.getWebGLErrorMessage());
-    
+
     }
-    
+
     var container, stats, clock;
     var camera, scene, renderer;
-    
+
     init();
     animate();
-    
-    
+
+
     function init() {
-    
+
         container = document.getElementById('render-box');
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 2000);
-		window.camera = camera
+		    window.camera = camera
         scene = new THREE.Scene();
-    
+        window.scene = scene;
         // load unimog model
-    
+
         loadModel('unimog.min.json');
 
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
-    
+
         var directionalLight = new THREE.DirectionalLight(0xeeeeee);
         directionalLight.position.set(1, 1, - 1);
         directionalLight.position.normalize();
         scene.add(directionalLight);
-    
+
         //
-    
+
         renderer = new THREE.WebGLRenderer();
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.style.width = '99.7%';
+        renderer.domElement.style.height = '100%';
+        console.log(renderer)
         container.appendChild(renderer.domElement);
         test = {x: -0.21637741979625671, y: 8.833897368758429, z: 27.13939097042666}
         camera.position.z = test.z
         camera.position.y = test.y
         camera.position.x = test.x
-    
+
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-    
+
         controls.update();
-    
+
         //
-    
+
         stats = new Stats();
         container.appendChild(stats.dom);
-    
+
         //
-    
+
         window.addEventListener('resize', onWindowResize, false);
-    
+
     }
-    
+
     function onWindowResize() {
-    
+
         renderer.setSize(window.innerWidth, window.innerHeight);
-    
+        renderer.domElement.style.width = '99.7%';
+        renderer.domElement.style.height = '100%';
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
-    
+
     }
-    
+
     function animate() {
-    
+
         requestAnimationFrame(animate);
         controls.update();
-    
+
         render();
         stats.update();
-    
+        if(globalUnimog) {
+          display.textContent = `${globalUnimog.position.x.toFixed(3)}, ${globalUnimog.position.y.toFixed(3)}, ${globalUnimog.position.z.toFixed(3)}`
+        }
+
     }
-    
+
     function render() {
-    
+
         renderer.render(scene, camera);
-    
+
     }
 
     function translateModel(coord,container){
@@ -106,7 +115,7 @@ window.addEventListener('DOMContentLoaded',function(){
         globalUnimog.position.z += coord.z / 1000;
     }
 
-    
+
     function rotateModel(direction,x,y,radius){
         if(direction){
             globalUnimog.rotation.z += calculateRotationDegree(x,y,radius)*10;
@@ -116,7 +125,7 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function changeModel(nextModelUrl){
-        scene.remove(window.globalUnimog); 
+        scene.remove(window.globalUnimog);
         loadModel(nextModelUrl);
     }
 
@@ -125,7 +134,7 @@ window.addEventListener('DOMContentLoaded',function(){
         scaleValue /= 100;
         globalUnimog.scale.set(scaleValue,scaleValue,scaleValue);
     }
-    
+
 
     function loadModel(model){
         var loader = new THREE.AssimpJSONLoader();
