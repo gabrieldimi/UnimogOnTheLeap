@@ -109,9 +109,9 @@ window.addEventListener('DOMContentLoaded',function(){
     
     function rotateModel(direction,x,y,radius){
         if(direction){
-            globalUnimog.rotation.z += rotate(x,y,radius)*10;
+            globalUnimog.rotation.z += calculateRotationDegree(x,y,radius)*10;
         }else{
-            globalUnimog.rotation.z -= rotate(x,y,radius)*10;
+            globalUnimog.rotation.z -= calculateRotationDegree(x,y,radius)*10;
         }
     }
 
@@ -137,11 +137,15 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function calculateRotationDegree(x,y,radius){
-        var radian = Math.acos((Math.pow(x,2)+ Math.pow(y,2)- Math.pow(radius))/2*x*y);
+        var radian = Math.acos((Math.pow(x,2)+ Math.pow(y,2)- Math.pow(radius,2))/2*x*y);
         var temp = (Math.PI * ((radian/100))/180);
         return temp;
     }
 
+
+
     window.scene = scene;
+    window.rotateModel = rotateModel;
+    window.calculateRotationDegree= calculateRotationDegree;
 
 });

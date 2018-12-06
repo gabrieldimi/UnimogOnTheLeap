@@ -1,4 +1,4 @@
-Leap = require('leapjs');
+// Leap = require('leapjs');
 var express = require('express')
 var app = express();
 var http = require('http').Server(app);
@@ -31,9 +31,9 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
-var controller = new Leap.Controller({ enableGestures: true});
-controller.connect();
-console.log(controller.config);
+// var controller = new Leap.Controller({ enableGestures: true});
+// controller.connect();
+// console.log(controller.config);
 
 function getMovementDirection(frame) {
 		var hand = frame.hands[0];
@@ -66,7 +66,7 @@ function isGrabbing(frame) {
 	console.log(hand.grabStrength);
 }
 globalFrame = null;
-controller.on('frame', onFrame);
+// controller.on('frame', onFrame);
 function onFrame(frame)
 {
 	globalFrame = frame;
@@ -102,57 +102,57 @@ function isWholeSwipe(start, current) {
 	return start && (current[0] - start[0]) > 100;
 }
 
-controller.on('gesture', function(gesture) {
-	if(gesture.type == 'circle') {
-		console.log(gesture.state)
-		if(gesture.state == 'start') {
-			console.log('START')
-		} else if(gesture.state == 'update') {
-					pointableIds = gesture.pointableIds;
-					pointableIds.forEach(function(pointableId) {
-					var pointable = globalFrame.pointable(pointableId);
-					console.log(`center: ${gesture.center}, radius: ${gesture.radius}`)
-					console.log(pointable.stabilizedTipPosition)
-					console.log(`input ${(pointable.tipPosition[0] - gesture.center[0]) / gesture.radius}`)
-					deg = Math.acos((pointable.tipPosition[0] - gesture.center[0]) / gesture.radius)
-					console.log(deg);
-					gSocket.emit('rotateModel', deg * 100);
-					deg2 = Math.asin((pointable.tipPosition[1] - gesture.center[1]) / gesture.radius)
-					console.log(deg2)
-				});
-			} else if(gesture.state == 'stop') {
-				console.log('END')
-			}
-		} else if(gesture.type == 'swipe') {
-			if(gesture.state == 'start') {
-				console.log('START SWIPE')
-				start = gesture.startPosition;
-			} else if(gesture.state == 'stop') {
-				console.log('STOP SWIPE', start, gesture.position)
-				if(isWholeSwipe(start, gesture.position)) {
-					modelIndex = (modelIndex + 1) % models.length;
-					console.log(`changing Model to ${models[modelIndex]}`)
-					gSocket.emit('changeModel', models[modelIndex])
-					console.log('WHOLE SWIPE', start, gesture.position)
-				}
-				start = null;
-			}
-			if(gesture.direction[0] > 0) {
-                  swipeDirection = "right";
-									if(gesture.state == 'update') {
-										// if(isWholeSwipe(start, gesture.position)) {
-										// 	// modelIndex = (modelIndex + 1) % models.length;
-										// 	// console.log(`changing Model to ${models[modelIndex]}`)
-										// 	// gSocket.emit('changeModel', models[modelIndex])
-										// 	console.log('WHOLE SWIPE', start, gesture.position)
-										// }
-										console.log('UPDATE SWIPE')
-									}
-              } else {
-                  swipeDirection = "left";
-              }
-		}
-});
+// controller.on('gesture', function(gesture) {
+// 	if(gesture.type == 'circle') {
+// 		console.log(gesture.state)
+// 		if(gesture.state == 'start') {
+// 			console.log('START')
+// 		} else if(gesture.state == 'update') {
+// 					pointableIds = gesture.pointableIds;
+// 					pointableIds.forEach(function(pointableId) {
+// 					var pointable = globalFrame.pointable(pointableId);
+// 					console.log(`center: ${gesture.center}, radius: ${gesture.radius}`)
+// 					console.log(pointable.stabilizedTipPosition)
+// 					console.log(`input ${(pointable.tipPosition[0] - gesture.center[0]) / gesture.radius}`)
+// 					deg = Math.acos((pointable.tipPosition[0] - gesture.center[0]) / gesture.radius)
+// 					console.log(deg);
+// 					gSocket.emit('rotateModel', deg * 100);
+// 					deg2 = Math.asin((pointable.tipPosition[1] - gesture.center[1]) / gesture.radius)
+// 					console.log(deg2)
+// 				});
+// 			} else if(gesture.state == 'stop') {
+// 				console.log('END')
+// 			}
+// 		} else if(gesture.type == 'swipe') {
+// 			if(gesture.state == 'start') {
+// 				console.log('START SWIPE')
+// 				start = gesture.startPosition;
+// 			} else if(gesture.state == 'stop') {
+// 				console.log('STOP SWIPE', start, gesture.position)
+// 				if(isWholeSwipe(start, gesture.position)) {
+// 					modelIndex = (modelIndex + 1) % models.length;
+// 					console.log(`changing Model to ${models[modelIndex]}`)
+// 					gSocket.emit('changeModel', models[modelIndex])
+// 					console.log('WHOLE SWIPE', start, gesture.position)
+// 				}
+// 				start = null;
+// 			}
+// 			if(gesture.direction[0] > 0) {
+//                   swipeDirection = "right";
+// 									if(gesture.state == 'update') {
+// 										// if(isWholeSwipe(start, gesture.position)) {
+// 										// 	// modelIndex = (modelIndex + 1) % models.length;
+// 										// 	// console.log(`changing Model to ${models[modelIndex]}`)
+// 										// 	// gSocket.emit('changeModel', models[modelIndex])
+// 										// 	console.log('WHOLE SWIPE', start, gesture.position)
+// 										// }
+// 										console.log('UPDATE SWIPE')
+// 									}
+//               } else {
+//                   swipeDirection = "left";
+//               }
+// 		}
+// });
 
 
 http.listen(3000, function() {
