@@ -1,21 +1,14 @@
-    var io = io();
+var io = io();
+
 window.addEventListener('DOMContentLoaded',function(){
 
-    io.on('translateModel', function(coord){
-        translateModel(coord,null);
-    });
+    io.on('translateModel', translateModel);
     
-    io.on('changeModel', function(model){
-        changeModel(model);
-    });
+    io.on('changeModel',changeModel);
 
-    io.on('scaleModel', function(scaleValue){
-        scaleModel(scaleValue);
-    });
+    io.on('scaleModel',scaleModel);
 
-    io.on('rotateModel', function(radian){
-        rotateModel(radian);
-    });
+    io.on('rotateModel', rotateModel);
     
     if (WEBGL.isWebGLAvailable() === false) {
 
@@ -113,8 +106,13 @@ window.addEventListener('DOMContentLoaded',function(){
         globalUnimog.position.z += coord.z / 1000;
     }
 
-    function rotateModel(radian){
-        globalUnimog.rotation.z += Math.PI * (radian/100)/180;
+    
+    function rotateModel(direction,x,y,radius){
+        if(direction){
+            globalUnimog.rotation.z += rotate(x,y,radius)*10;
+        }else{
+            globalUnimog.rotation.z -= rotate(x,y,radius)*10;
+        }
     }
 
     function changeModel(nextModelUrl){
@@ -136,6 +134,12 @@ window.addEventListener('DOMContentLoaded',function(){
             object.scale.multiplyScalar(0.02);
             scene.add(object);
         });
+    }
+
+    function calculateRotationDegree(x,y,radius){
+        var radian = Math.acos((Math.pow(x,2)+ Math.pow(y,2)- Math.pow(radius))/2*x*y);
+        var temp = (Math.PI * ((radian/100))/180);
+        return temp;
     }
 
     window.scene = scene;
