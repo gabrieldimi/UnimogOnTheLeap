@@ -161,15 +161,13 @@ window.addEventListener('DOMContentLoaded',function(){
         return desiredFactor;
     }
 
-    function resetModel(allowance){
+    function resetModel(){
         var identityVector = {'x':0,'y':0,'z':0};
-        if(allowance == 1){
-            globalUnimog.position = identityVector;
-            globalUnimog.rotation = identityVector;
-            var desiredFactor = uniformScale(desiredVolume,globalUnimog);
-            globalUnimog.scale.multiplyScalar(desiredFactor);
-            console.log("unimog's position reseted");
-        }
+        globalUnimog.position = identityVector;
+        globalUnimog.rotation = identityVector;
+        var desiredFactor = uniformScale(desiredVolume,globalUnimog);
+        globalUnimog.scale.multiplyScalar(desiredFactor);
+        console.log("unimog's position reseted");
     }
 
     function calculateRotationDegree(x,y,radius){
