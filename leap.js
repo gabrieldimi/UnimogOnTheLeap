@@ -64,7 +64,8 @@ function handleTranslation(frame) {
 function handleReset(hands) {
   console.log(`hand1Normal: ${hands[0].palmNormal}, hand2Normal: ${hands[1].palmNormal} `)
   //NOTE: Externalized value
-  if(hands[0].palmNormal[1] > settings.palmNormalThreshold && hands[1].palmNormal[1] > settings.palmNormalThreshold) {
+  if(Math.abs(hands[0].palmNormal[1]) > settings.palmNormalThreshold && Math.abs(hands[1].palmNormal[1]) > settings.palmNormalThreshold) {
+    console.log('EMIT reset')
     gSocket.emit('resetModel');
   }
 }
@@ -73,7 +74,7 @@ var tempFrame;
 function onFrame(frame)
 {
 	globalFrame = frame;
-	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > 1000000))) {
+	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > 16666))) {
     tempFrame = frame;
 		if(isConnected) {
        //NOTE: Externalized Value: grabStrength
