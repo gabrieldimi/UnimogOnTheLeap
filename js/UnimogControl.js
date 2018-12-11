@@ -112,7 +112,10 @@ window.addEventListener('DOMContentLoaded',function(){
         // if(upperleftY <= container.clientHeight && y >= 0 ){
             globalUnimog.position.y += coord.y / 1000;
         // }
-        globalUnimog.position.z += coord.z / 1000;
+        if(coord.z >= -20 && coord.z <= camera.position.z){
+
+            globalUnimog.position.z += coord.z / 1000;
+        }
     }
 
 
@@ -146,7 +149,16 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function calculateRotationDegree(x,y,radius){
-        var radian = Math.acos((Math.pow(x,2)+ Math.pow(y,2)- Math.pow(radius,2))/2*x*y);
+        var radian = Math.asin(x/radius);
+        if(x < 0 && y > 0){
+            radian = Math.abs(radian) + 90;
+        }else if (x < 0 && y < 0){
+            radian = Math.abs(radian) + 180;
+        }else if ( x > 0 && y < 0){
+            radian = Math.abs(radian) + 270;
+        }else{
+            radian = Math.abs(radian);
+        }
         var temp = (Math.PI * ((radian/100))/180);
         return temp;
     }
