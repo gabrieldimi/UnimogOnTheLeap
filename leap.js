@@ -30,11 +30,17 @@ models.forEach(file => {
   console.log(file);
 });
 
+function handleParameters(jsonString) {
+  console.log(jsonString);
+}
+
 io.on('connection', function(socket) {
 	console.log("connected")
 	isConnected = true;
 	gSocket = socket;
+  gSocket.on('parameters', handleParameters)
 });
+
 app.get('/', function(req, res) {
 	console.log("Client IP: " + req.connection.remoteAddress)
 	res.sendFile(__dirname + '/index.html');
@@ -55,17 +61,29 @@ function handleTranslation(frame) {
   // }
 }
 
+function handleReset(hands) {
+  console.log(`hand1Normal: ${hands[0].palmNormal}, hand2Normal: ${hands[1].palmNormal} `)
+  //NOTE: Externalized value
+  if(hands[0].palmNormal[1] > settings.palmNormalThreshold && hands[1].palmNormal[1] > settings.palmNormalThreshold) {
+    gSocket.emit('resetModel');
+  }
+}
+
 var tempFrame;
 function onFrame(frame)
 {
 	globalFrame = frame;
-	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > 16666))) {
+	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > 1000000))) {
     tempFrame = frame;
 		if(isConnected) {
        //NOTE: Externalized Value: grabStrength
 			if(frame.hands[0].grabStrength >= settings.grabStrength) {
         handleTranslation(frame);
 			}
+
+      if(frame.hands.length >= 2) {
+        handleReset(frame.hands)
+      }
 		}
 	}
 }
@@ -100,11 +118,10 @@ function handleCircle(gesture) {
         var pointable = globalFrame.pointable(pointableId);
         console.log(`center: ${gesture.center}, radius: ${gesture.radius}`)
         console.log(pointable.stabilizedTipPosition)
-        console.log(`input ${(pointable.tipPosition[0] - gesture.center[0]) / gesture.radius}`)
-        deg = Math.acos((pointable.tipPosition[0] - gesture.center[0]) / gesture.radius)
-        console.log(deg);
+        input = [0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius]
+        console.log(input)
         if(isConnected) {
-          gSocket.emit('rotateModel', deg * settings.gesture.circle.multiplier); //NOTE: externalized value: circle.multiplier
+          gSocket.emit('rotateModel', 0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius); //NOTE: externalized value: circle.multiplier
         }
       });
     } else if(gesture.state == 'stop') {

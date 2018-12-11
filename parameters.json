@@ -8,5 +8,6 @@
     "circle": {
       "multiplier": 25
     }
-  }
+  },
+  "palmNormalThreshold": 0.9
 }
