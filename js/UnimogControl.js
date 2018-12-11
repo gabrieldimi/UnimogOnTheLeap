@@ -120,12 +120,13 @@ window.addEventListener('DOMContentLoaded',function(){
 
     function rotateModel(direction,x,y,radius){
         var zLokal = calculateRotationDegree(x,y,radius);
+        delta = Math.max(zLokal,zGlobal) - Math.min(zLokal, zGlobal)
         if(direction){
-            globalUnimog.rotation.z += (zLokal - zGlobal) /2.5;
+            globalUnimog.rotation.z += (delta) / 100;
         }else{
-            globalUnimog.rotation.z -= (zLokal - zGlobal)/2.5;
+            globalUnimog.rotation.z -= (delta)/2.5;
         }
-        
+        // console.log(`delta: ${delta}`)
         zGlobal = zLokal;
     }
 
@@ -151,24 +152,25 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function calculateRotationDegree(x,y,radius){
-        if(radius > x){
+      // console.log(`x: ${x}, y: ${y} radius: ${radius}, x/radius: ${x/radius}`);
+        if(x/radius > 1){
             radius = x;
         }
-        if( x > radius){
+        if(x/radius < -1){
             x = radius;
         }
         var radian = Math.asin(x/radius);
-        if(x < 0 && y > 0){
+        if(x <= 0 && y >= 0){
             radian = Math.abs(radian) + Math.PI /2;
-        }else if (x < 0 && y < 0){
+        }else if (x <= 0 && y <= 0){
             radian = Math.abs(radian) + Math.PI;
-        }else if ( x > 0 && y < 0){
+        }else if ( x >= 0 && y <= 0){
             radian = Math.abs(radian) + (Math.PI * 3)/2;
         }else{
             radian = Math.abs(radian);
         }
-        var degree = (Math.PI * (radian)/180);
-        console.log(`x: ${x}, radius: ${radius}, x/radius: ${x/radius}, degree: ${degree}`);
+        var degree = (radian * 180 / Math.PI);
+                console.log(`degree ${degree}`)
         return degree;
     }
 
