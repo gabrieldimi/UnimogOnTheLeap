@@ -149,6 +149,9 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function calculateRotationDegree(x,y,radius){
+        if(radius > x){
+            radius = x;
+        }
         var radian = Math.asin(x/radius);
         if(x < 0 && y > 0){
             radian = Math.abs(radian) + Math.PI /2;
@@ -159,8 +162,9 @@ window.addEventListener('DOMContentLoaded',function(){
         }else{
             radian = Math.abs(radian);
         }
-        var temp = (Math.PI * ((radian/100))/180);
-        return temp;
+        var degree = (Math.PI * (radian)/180);
+        console.log(`x: ${x}, radius: ${radius}, x/radius: ${x/radius}, degree: ${degree}`);
+        return degree;
     }
 
 
