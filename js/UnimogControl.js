@@ -1,5 +1,5 @@
 var io = io();
-
+var zGlobal = 0;
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
@@ -20,7 +20,6 @@ window.addEventListener('DOMContentLoaded',function(){
 
     var container, stats, clock;
     var camera, scene, renderer;
-
     init();
     animate();
 
@@ -120,11 +119,14 @@ window.addEventListener('DOMContentLoaded',function(){
 
 
     function rotateModel(direction,x,y,radius){
+        var zLokal = calculateRotationDegree(x,y,radius);
         if(direction){
-            globalUnimog.rotation.z += calculateRotationDegree(x,y,radius)*10;
+            globalUnimog.rotation.z += (zLokal - zGlobal) /2.5;
         }else{
-            globalUnimog.rotation.z -= calculateRotationDegree(x,y,radius)*10;
+            globalUnimog.rotation.z -= (zLokal - zGlobal)/2.5;
         }
+        
+        zGlobal = zLokal;
     }
 
     function changeModel(nextModelUrl){
@@ -167,7 +169,7 @@ window.addEventListener('DOMContentLoaded',function(){
         }
         var degree = (Math.PI * (radian)/180);
         console.log(`x: ${x}, radius: ${radius}, x/radius: ${x/radius}, degree: ${degree}`);
-        return degree / 100;
+        return degree;
     }
 
 
