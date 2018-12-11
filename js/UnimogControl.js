@@ -162,9 +162,12 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function resetModel(){
-        var identityVector = {'x':0,'y':0,'z':0};
-        globalUnimog.position = identityVector;
-        globalUnimog.rotation = identityVector;
+        globalUnimog.position.x = 0;
+        globalUnimog.position.y = 0;
+        globalUnimog.position.z = 0;
+        globalUnimog.rotation.x = 0;
+        globalUnimog.rotation.y = 0;
+        globalUnimog.rotation.z = 0;
         var desiredFactor = uniformScale(desiredVolume,globalUnimog);
         globalUnimog.scale.multiplyScalar(desiredFactor);
         console.log("unimog's position reseted");
