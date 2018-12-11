@@ -151,11 +151,11 @@ window.addEventListener('DOMContentLoaded',function(){
     function calculateRotationDegree(x,y,radius){
         var radian = Math.asin(x/radius);
         if(x < 0 && y > 0){
-            radian = Math.abs(radian) + 90;
+            radian = Math.abs(radian) + Math.PI /2;
         }else if (x < 0 && y < 0){
-            radian = Math.abs(radian) + 180;
+            radian = Math.abs(radian) + Math.PI;
         }else if ( x > 0 && y < 0){
-            radian = Math.abs(radian) + 270;
+            radian = Math.abs(radian) + (Math.PI * 3)/2;
         }else{
             radian = Math.abs(radian);
         }
