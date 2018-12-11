@@ -1,5 +1,6 @@
 var io = io();
 var zGlobal = 0;
+var desiredVolume = 250;
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
@@ -9,6 +10,8 @@ window.addEventListener('DOMContentLoaded',function(){
     io.on('scaleModel',scaleModel);
 
     io.on('rotateModel', rotateModel);
+
+    io.on('resetModel', resetModel);
 
     display = document.getElementById('displayPanel');
 
@@ -126,7 +129,7 @@ window.addEventListener('DOMContentLoaded',function(){
             globalUnimog.rotation.z -= (zLokal - zGlobal)/2.5;
         }
         
-        zGlobal = zLokal;
+        zGlobal += zLokal;
     }
 
     function changeModel(nextModelUrl){
@@ -145,9 +148,28 @@ window.addEventListener('DOMContentLoaded',function(){
         var loader = new THREE.AssimpJSONLoader();
         loader.load(model, function (object) {
             window.globalUnimog = object;
-            object.scale.multiplyScalar(0.02);
+            var desiredFactor = uniformScale(desiredVolume,object);
+            object.scale.multiplyScalar(desiredFactor);
             scene.add(object);
         });
+    }
+
+    function uniformScale(desiredVolume, object){
+        var size = new THREE.Box3().setFromObject(object).getSize();
+        var desiredFactor = Math.cbrt(desiredVolume / (size.x * size.y * size.z));
+        console.log(`desired factor for scaling: ${desiredFactor}`);
+        return desiredFactor;
+    }
+
+    function resetModel(allowance){
+        var identityVector = {'x':0,'y':0,'z':0};
+        if(allowance == 1){
+            globalUnimog.position = identityVector;
+            globalUnimog.rotation = identityVector;
+            var desiredFactor = uniformScale(desiredVolume,globalUnimog);
+            globalUnimog.scale.multiplyScalar(desiredFactor);
+            console.log("unimog's position reseted");
+        }
     }
 
     function calculateRotationDegree(x,y,radius){
@@ -158,11 +180,12 @@ window.addEventListener('DOMContentLoaded',function(){
             x = radius;
         }
         var radian = Math.asin(x/radius);
-        if(x < 0 && y > 0){
+    
+        if(x <= 0 && y >= 0){
             radian = Math.abs(radian) + Math.PI /2;
-        }else if (x < 0 && y < 0){
+        }else if (x <= 0 && y <= 0){
             radian = Math.abs(radian) + Math.PI;
-        }else if ( x > 0 && y < 0){
+        }else if ( x >= 0 && y <= 0){
             radian = Math.abs(radian) + (Math.PI * 3)/2;
         }else{
             radian = Math.abs(radian);
