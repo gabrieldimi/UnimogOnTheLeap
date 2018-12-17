@@ -22,8 +22,10 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     var container, stats, clock;
-    var camera, scene, renderer;
+    var camera, scene, renderer, effect, globalUnimog;
     init();
+    
+    addPeppersGhost();
     animate();
 
 
@@ -31,7 +33,7 @@ window.addEventListener('DOMContentLoaded',function(){
 
         container = document.getElementById('render-box');
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 2000);
-		    window.camera = camera
+		window.camera = camera
         scene = new THREE.Scene();
         window.scene = scene;
         // load unimog model
@@ -55,7 +57,7 @@ window.addEventListener('DOMContentLoaded',function(){
         renderer.domElement.style.height = '100%';
         console.log(renderer)
         container.appendChild(renderer.domElement);
-        test = {x: -0.21637741979625671, y: 8.833897368758429, z: 27.13939097042666}
+        test = {x: -0.000000000000000000000000000000000000000000000000000000000000000000000001, y: 0.000000000000000000000000000000000000000001, z:0.000000000000000000000000000000000000000000000000001}
         camera.position.z = test.z
         camera.position.y = test.y
         camera.position.x = test.x
@@ -74,6 +76,12 @@ window.addEventListener('DOMContentLoaded',function(){
         window.addEventListener('resize', onWindowResize, false);
 
     }
+
+    function addPeppersGhost() {
+            effect = new THREE.PeppersGhostEffect(renderer );
+            effect.setSize(window.innerWidth, window.innerHeight);
+            effect.cameraDistance = 50;
+      }
 
     function onWindowResize() {
 
@@ -100,7 +108,7 @@ window.addEventListener('DOMContentLoaded',function(){
 
     function render() {
 
-        renderer.render(scene, camera);
+        effect.render(scene, camera);
 
     }
 
