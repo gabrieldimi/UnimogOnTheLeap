@@ -123,7 +123,8 @@ function handleCircle(gesture) {
         console.log(input)
         if(isConnected) {
           gSocket.emit('rotateModel', 0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius); //NOTE: externalized value: circle.multiplier
-        }
+		  //console.error(`[${pointable.tipPosition[0] - gesture.center[0]}, ${pointable.tipPosition[1] - gesture.center[1]}, ${gesture.radius}]`)
+		}
       });
     } else if(gesture.state == 'stop') {
       console.log('END')
