@@ -28,7 +28,6 @@ window.addEventListener('DOMContentLoaded',function(){
     addPeppersGhost();
     animate();
 
-
     function init() {
 
         container = document.getElementById('render-box');
@@ -36,8 +35,8 @@ window.addEventListener('DOMContentLoaded',function(){
 		window.camera = camera
         scene = new THREE.Scene();
         window.scene = scene;
-        // load unimog model
 
+        // load unimog model
         loadModel('unimog.min.json');
 
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
@@ -133,11 +132,11 @@ window.addEventListener('DOMContentLoaded',function(){
         var zLokal = calculateRotationDegree(x,y,radius);
         delta = Math.max(zLokal,zGlobal) - Math.min(zLokal, zGlobal)
         if(direction){
-            globalUnimog.rotation.z += (delta) / 100;
+            globalUnimog.rotation.z += (delta) / 10;
         }else{
-            globalUnimog.rotation.z -= (delta)/2.5;
+            globalUnimog.rotation.z -= (delta) / 100;
         }
-        // console.log(`delta: ${delta}`)
+        //console.log(`delta: ${delta}`)
         zGlobal = zLokal;
     }
 
@@ -156,7 +155,7 @@ window.addEventListener('DOMContentLoaded',function(){
     function loadModel(model){
         var loader = new THREE.AssimpJSONLoader();
         loader.load(model, function (object) {
-            window.globalUnimog = object;
+            globalUnimog = object;
             var desiredFactor = uniformScale(desiredVolume,object);
             object.scale.multiplyScalar(desiredFactor);
             scene.add(object);
@@ -183,26 +182,9 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function calculateRotationDegree(x,y,radius){
-      // console.log(`x: ${x}, y: ${y} radius: ${radius}, x/radius: ${x/radius}`);
-        if(x/radius > 1){
-            radius = x;
-        }
-        if(x/radius < -1){
-            x = radius;
-        }
-        var radian = Math.asin(x/radius);
-
-        if(x <= 0 && y >= 0){
-            radian = Math.abs(radian) + Math.PI /2;
-        }else if (x <= 0 && y <= 0){
-            radian = Math.abs(radian) + Math.PI;
-        }else if ( x >= 0 && y <= 0){
-            radian = Math.abs(radian) + (Math.PI * 3)/2;
-        }else{
-            radian = Math.abs(radian);
-        }
-        var degree = (radian * 180 / Math.PI);
-                console.log(`degree ${degree}`)
+        var radian = Math.atan2((y/radius),(x/radius));
+        var degree = (((radian * 180 / Math.PI) + 360) % 360);
+        console.log(`x: ${x}, y: ${y} radius: ${radius}, degree ${degree}`);
         return degree;
     }
 
