@@ -18,6 +18,7 @@ app.use(express.static('js'))
 app.use(express.static('models'))
 
 lastFrame = null;
+pullStart = false;
 isConnected = false;
 gSocket = null
 models = fs.readdirSync('./models/');
@@ -70,20 +71,72 @@ function handleReset(hands) {
   }
 }
 
+function handlePullApart(hands) {
+  console.log(`
+    ----------------
+    ${globalFrame.timestamp}
+    left hand fingers
+    ----------------`)
+    fingersLeft = hands[0].fingers
+    fingersRight = hands[1].fingers
+    var fourExtension = true;
+    for(var i =0; i < fingersLeft.length; i++) {
+      console.log(`${fingersLeft[i].type}, extended? ${fingersLeft[i].extended}` )
+      if(fingersLeft[i].type === 1 || fingersLeft[i].type === 2) {
+        fourExtension = fourExtension && fingersLeft[i].extended
+      }
+      if(fingersLeft[i].type !== 1 && fingersLeft[i].type !== 2) {
+        fourExtension = fourExtension && !fingersLeft[i].extended
+      }
+    }
+    console.log(`
+      ----------------
+      right hand fingers
+      ----------------`)
+    for(var i =0; i < fingersRight.length; i++) {
+      console.log(`${fingersRight[i].type}, extended? ${fingersRight[i].extended}` )
+      if(fingersRight[i].type === 1 || fingersRight[i].type === 2) {
+        fourExtension = fourExtension && fingersRight[i].extended
+      }
+      if(fingersRight[i].type !== 1 && fingersRight[i].type !== 2) {
+        fourExtension = fourExtension && !fingersRight[i].extended
+      }
+    }
+    if(fourExtension) {
+      distance = Math.abs(hands[0].palmPosition[0] - hands[1].palmPosition[0]);
+      if(distance <= settings.uncover.minThreshold) {
+        console.log('pullSTART')
+        pullStart = true;
+        return;
+      }
+      console.log(`distance: ${distance}`)
+      if(distance >= settings.uncover.triggerThreshold && pullStart) {
+        pullStart = false;
+        console.log('uncover event')
+        gSocket.emit('uncoverModel')
+      }
+    }
+}
+
 var tempFrame;
 function onFrame(frame)
 {
 	globalFrame = frame;
-	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > 16666))) {
+	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > settings.frametime))) {
     tempFrame = frame;
 		if(isConnected) {
        //NOTE: Externalized Value: grabStrength
-			if(frame.hands[0].grabStrength >= settings.grabStrength) {
+			if(frame.hands[0].grabStrength >= settings.grabStrength && settings.translation) {
         handleTranslation(frame);
 			}
 
       if(frame.hands.length >= 2) {
-        handleReset(frame.hands)
+        if(settings.reset) {
+          handleReset(frame.hands);
+        }
+        if(settings.pullApart) {
+          handlePullApart(frame.hands);
+        }
       }
 		}
 	}
@@ -158,9 +211,9 @@ function handleSwipe(gesture) {
 }
 
 function handleGesture(gesture) {
-  if(gesture.type == 'circle') {
+  if(gesture.type == 'circle' && settings.circle) {
       handleCircle(gesture);
-		} else if(gesture.type == 'swipe') {
+		} else if(gesture.type == 'swipe' && settings.swipe) {
       handleSwipe(gesture);
 		}
 }

@@ -1,5 +1,15 @@
 {
+  "swipe": false,
+  "circle": false,
+  "translation": false,
+  "reset": false,
+  "pullApart": true,
+  "frametime": 16666,
   "grabStrength": 1,
+  "uncover": {
+    "minThreshold": 155,
+    "triggerThreshold": 300
+  },
   "gesture": {
     "swipe": {
       "minLength": 100,

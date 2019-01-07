@@ -15,6 +15,8 @@ window.addEventListener('DOMContentLoaded',function(){
 
     io.on('resetModel', resetModel);
 
+    io.on('uncoverModel', pullApartCube)
+
     display = document.getElementById('displayPanel');
 
     if (WEBGL.isWebGLAvailable() === false) {
@@ -27,7 +29,7 @@ window.addEventListener('DOMContentLoaded',function(){
     var camera, scene, renderer, effect, globalUnimog;
 
     init();
-    
+
     addPeppersGhost();
     animate();
 
@@ -42,7 +44,7 @@ window.addEventListener('DOMContentLoaded',function(){
         // load unimog model
         loadModel('unimog.min.json');
 
-        
+
         materials = [
             new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe : true} ),
             new THREE.MeshBasicMaterial( { transparent: true, opacity: 0 } )
@@ -69,7 +71,7 @@ window.addEventListener('DOMContentLoaded',function(){
         var toggle1 = true;
         for( var i = 0; i < geometry1.faces.length; i+=2 ) {
             if(toggle1){
-                geometry1.faces[ i ].materialIndex = 0;                
+                geometry1.faces[ i ].materialIndex = 0;
                 geometry1.faces[ i +1].materialIndex = 0;
                 toggle1 = false;
             }else{
@@ -80,14 +82,14 @@ window.addEventListener('DOMContentLoaded',function(){
         }
 
 
-        
+
         cube = new THREE.Mesh(geometry, materials);
         cube1 = new THREE.Mesh( geometry1, materials );
         scene.add( cube );
         scene.add(cube1);
 
 
-    
+
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
 
