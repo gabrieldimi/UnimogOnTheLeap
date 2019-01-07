@@ -1,6 +1,8 @@
 var io = io();
 var zGlobal = 0;
 var desiredVolume = 250;
+var cube;
+var cube1;
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
@@ -23,6 +25,7 @@ window.addEventListener('DOMContentLoaded',function(){
 
     var container, stats, clock;
     var camera, scene, renderer, effect, globalUnimog;
+
     init();
     
     addPeppersGhost();
@@ -39,6 +42,52 @@ window.addEventListener('DOMContentLoaded',function(){
         // load unimog model
         loadModel('unimog.min.json');
 
+        
+        materials = [
+            new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe : true} ),
+            new THREE.MeshBasicMaterial( { transparent: true, opacity: 0 } )
+        ];
+
+        geometry = new THREE.CubeGeometry( 10, 10, 10);
+        // assign material to each face
+        var toggle = true;
+        for( var i = 0; i < geometry.faces.length; i+=2 ) {
+            if(toggle){
+                geometry.faces[ i].materialIndex = 1;
+                geometry.faces[ i +1].materialIndex = 1;
+                toggle = false;
+            }else{
+                geometry.faces[ i ].materialIndex = 0;
+                geometry.faces[ i +1].materialIndex = 0;
+                toggle = true;
+            }
+        }
+
+
+        geometry1 = new THREE.CubeGeometry( 10, 10, 10 );
+        // assign material to each face
+        var toggle1 = true;
+        for( var i = 0; i < geometry1.faces.length; i+=2 ) {
+            if(toggle1){
+                geometry1.faces[ i ].materialIndex = 0;                
+                geometry1.faces[ i +1].materialIndex = 0;
+                toggle1 = false;
+            }else{
+                geometry1.faces[ i ].materialIndex = 1;
+                geometry1.faces[ i +1].materialIndex = 1;
+                toggle1 = true;
+            }
+        }
+
+
+        
+        cube = new THREE.Mesh(geometry, materials);
+        cube1 = new THREE.Mesh( geometry1, materials );
+        scene.add( cube );
+        scene.add(cube1);
+
+
+    
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
 
@@ -188,6 +237,11 @@ window.addEventListener('DOMContentLoaded',function(){
         return degree;
     }
 
+
+    function pullApartCube(){
+        cube.position.z +=5;
+        cube1.position.z -=5;
+    }
 
 
     window.scene = scene;
