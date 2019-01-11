@@ -69,16 +69,16 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 		// left
 		_cameraL.position.copy( _position );
 		_cameraL.quaternion.copy( _quaternion );
-		_cameraL.translateX( ( scope.cameraDistance ) );
+		_cameraL.translateZ( scope.cameraDistance );
 		_cameraL.lookAt( scene.position );
-		_cameraL.rotation.x += 90 * ( Math.PI / 180 );
+		_cameraL.rotation.z -= 90 * ( Math.PI / 180 );
 
 		// right
 		_cameraR.position.copy( _position );
 		_cameraR.quaternion.copy( _quaternion );
-		_cameraR.translateX( scope.cameraDistance );
+		_cameraR.translateZ( scope.cameraDistance );
 		_cameraR.lookAt( scene.position );
-		_cameraR.rotation.x += 90 * ( Math.PI / 180 );
+		_cameraR.rotation.z += 90 * ( Math.PI / 180 );
 
 
 		renderer.clear();
