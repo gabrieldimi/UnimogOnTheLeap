@@ -1,3 +1,6 @@
+/*
+TODO clockwise rotation
+*/
 const args = process.argv;
 console.log(`Starting with args: ${args}`);
 if(args.length < 3 || args[2] !== 'noleap') {
@@ -16,6 +19,7 @@ var fs = require('fs');
 
 app.use(express.static('js'))
 app.use(express.static('models'))
+app.use(express.static('assets'))
 
 lastFrame = null;
 pullStart = false;

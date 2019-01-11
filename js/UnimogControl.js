@@ -1,8 +1,11 @@
+/**
+TODO change camera position
+*/
 var io = io();
 var zGlobal = 0;
-var desiredVolume = 250;
+var desiredVolume = 200;
+var globalUnimog;
 var cube;
-var cube1;
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
@@ -26,7 +29,9 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     var container, stats, clock;
-    var camera, scene, renderer, effect, globalUnimog;
+    var camera, scene, renderer, effect;
+    var uncovered = false;
+    var loader = new THREE.AssimpJSONLoader();
 
     init();
 
@@ -37,56 +42,20 @@ window.addEventListener('DOMContentLoaded',function(){
 
         container = document.getElementById('render-box');
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 2000);
-		window.camera = camera
+     		window.camera = camera
         scene = new THREE.Scene();
         window.scene = scene;
 
         // load unimog model
-        loadModel('unimog.min.json');
+        loadModel('unimog.min.json',globalUnimog);
+        // loadModel('gaggenauCube.json',cube);
 
-
-        materials = [
-            new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe : true} ),
-            new THREE.MeshBasicMaterial( { transparent: true, opacity: 0 } )
-        ];
-
-        geometry = new THREE.CubeGeometry( 10, 10, 10);
-        // assign material to each face
-        var toggle = true;
-        for( var i = 0; i < geometry.faces.length; i+=2 ) {
-            if(toggle){
-                geometry.faces[ i].materialIndex = 1;
-                geometry.faces[ i +1].materialIndex = 1;
-                toggle = false;
-            }else{
-                geometry.faces[ i ].materialIndex = 0;
-                geometry.faces[ i +1].materialIndex = 0;
-                toggle = true;
-            }
-        }
-
-
-        geometry1 = new THREE.CubeGeometry( 10, 10, 10 );
-        // assign material to each face
-        var toggle1 = true;
-        for( var i = 0; i < geometry1.faces.length; i+=2 ) {
-            if(toggle1){
-                geometry1.faces[ i ].materialIndex = 0;
-                geometry1.faces[ i +1].materialIndex = 0;
-                toggle1 = false;
-            }else{
-                geometry1.faces[ i ].materialIndex = 1;
-                geometry1.faces[ i +1].materialIndex = 1;
-                toggle1 = true;
-            }
-        }
-
-
-
-        cube = new THREE.Mesh(geometry, materials);
-        cube1 = new THREE.Mesh( geometry1, materials );
-        scene.add( cube );
-        scene.add(cube1);
+        loader.load('gaggenauCube.json', function (object) {
+            cube = object;
+            var desiredFactor = uniformScale(600,object);
+            object.scale.multiplyScalar(desiredFactor);
+            scene.add(object);
+        });
 
 
 
@@ -107,10 +76,10 @@ window.addEventListener('DOMContentLoaded',function(){
         renderer.domElement.style.height = '100%';
         console.log(renderer)
         container.appendChild(renderer.domElement);
-        test = {x: -0.000000000000000000000000000000000000000000000000000000000000000000000001, y: 0.000000000000000000000000000000000000000001, z:0.000000000000000000000000000000000000000000000000001}
-        camera.position.z = test.z
-        camera.position.y = test.y
-        camera.position.x = test.x
+        // test = {x: 0.000000000000000000000000000000000000000000000000000000000000000000000001, y: 0.000000000000000000000000000000000000000001, z:0.000000000000000000000000000000000000000000000000001}
+        // camera.position.z = test.z
+        // camera.position.y = test.y
+        // camera.position.x = test.x
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -163,18 +132,12 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function translateModel(coord,container){
-        // console.log(object.getSize())
-        // var lowerRightX = coord.x + object.max;
-        // var upperleftY = coord.y + object.max;
-        // if(lowerRightX <= container.clientWidth && x >= 0 ){
-            globalUnimog.position.x += coord.x / 1000;
-        // }
-        // if(upperleftY <= container.clientHeight && y >= 0 ){
-            globalUnimog.position.y += coord.y / 1000;
-        // }
-        if(coord.z >= -20 && coord.z <= camera.position.z){
+        if(uncovered){
+          globalUnimog.position.x += coord.x / 1000;
+          globalUnimog.position.y += coord.y / 1000;
 
-            globalUnimog.position.z += coord.z / 1000;
+              globalUnimog.position.z += coord.z / 1000;
+
         }
     }
 
@@ -187,7 +150,6 @@ window.addEventListener('DOMContentLoaded',function(){
         }else{
             globalUnimog.rotation.z -= (delta) / 100;
         }
-        //console.log(`delta: ${delta}`)
         zGlobal = zLokal;
     }
 
@@ -204,7 +166,6 @@ window.addEventListener('DOMContentLoaded',function(){
 
 
     function loadModel(model){
-        var loader = new THREE.AssimpJSONLoader();
         loader.load(model, function (object) {
             globalUnimog = object;
             var desiredFactor = uniformScale(desiredVolume,object);
@@ -241,8 +202,15 @@ window.addEventListener('DOMContentLoaded',function(){
 
 
     function pullApartCube(){
-        cube.position.z +=5;
-        cube1.position.z -=5;
+        if(cube && Math.abs(cube.children[0].position.x - cube.children[1].position.x) <= 20){
+          cube.children[0].position.x -=10;
+          cube.children[1].position.x +=10;
+          uncovered = true;
+        }else{
+          scene.remove(cube);
+          console.log("cube removed")
+        }
+
     }
 
 
