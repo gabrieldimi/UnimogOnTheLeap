@@ -9,8 +9,8 @@
 		<script src="AssimpJSONLoader.js"></script>
 		<script src="OrbitControls.js"></script>
 		<script src="WebGL.js"></script>
-		<script src="PeppersGhostEffect.js"></script>"
-		<script src="rotate_values.js"></script>"
+		<script src="PeppersGhostEffect.js"></script>
+		<script src="rotate_values.js"></script>
     <script src="stats.min.js"></script>
     <script src="UnimogControl.js"> </script>
 		<style>
@@ -29,8 +29,14 @@
 	</head>
 
 	<body>
-	<div id="render-box" style='overflow:hidden'>
-			<div id='displayPanel' style='position:fixed; right: 25px; top:0; color: #fff'>test</div>
+	<div id="render-box" style='overflow:hidden; width: 100%; height: 100%;'>
+			<div id='displayPanel' style='position:fixed; right: 25px; top:0; color: #fff'>
+				<div id='displayPanel' style='position:fixed; right: 5px; top:0; color: #fff'>
+					model: <span id='unimogModel'>test</span>
+					position: <span id='unimogPosition'></span>
+					<button id='uncover'>uncover</button>
+				</div>
+			</div>
   </div>
 	</body>
 </html>
