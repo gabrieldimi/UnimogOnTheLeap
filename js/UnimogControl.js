@@ -75,6 +75,7 @@ window.addEventListener('DOMContentLoaded',function(){
         //
 
         renderer = new THREE.WebGLRenderer();
+        window.renderer = renderer;
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.domElement.style.width = '99.7%';
@@ -135,9 +136,8 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function render() {
-
-        effect.render(scene, camera);
-
+          effect.render(scene, camera);
+          // renderer.render(scene, camera)
     }
 
     function translateModel(coord,container){
@@ -155,9 +155,9 @@ window.addEventListener('DOMContentLoaded',function(){
         var zLokal = calculateRotationDegree(x,y,radius);
         delta = Math.max(zLokal,zGlobal) - Math.min(zLokal, zGlobal)
         if(direction){
-            globalUnimog.rotation.z += (delta) / 10;
+            globalUnimog.rotation.z += (delta) / 1000;
         }else{
-            globalUnimog.rotation.z -= (delta) / 100;
+            globalUnimog.rotation.z -= (delta) / 1000;
         }
         zGlobal = zLokal;
     }
@@ -206,7 +206,7 @@ window.addEventListener('DOMContentLoaded',function(){
     function calculateRotationDegree(x,y,radius){
         var radian = Math.atan2((y/radius),(x/radius));
         var degree = (((radian * 180 / Math.PI) + 360) % 360);
-        console.log(`x: ${x}, y: ${y} radius: ${radius}, degree ${degree}`);
+        // console.log(`x: ${x}, y: ${y} radius: ${radius}, degree ${degree}`);
         return degree;
     }
 
