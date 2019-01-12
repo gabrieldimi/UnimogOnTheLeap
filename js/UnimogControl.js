@@ -20,6 +20,11 @@ window.addEventListener('DOMContentLoaded',function(){
 
     io.on('uncoverModel', pullApartCube)
 
+    displayPosition = document.getElementById('unimogPosition');
+    displayUnimogModel = document.getElementById('unimogModel');
+    uncover = document.getElementById('uncover');
+    uncover.addEventListener('click', pullApartCube)
+
     display = document.getElementById('displayPanel');
 
     if (WEBGL.isWebGLAvailable() === false) {
@@ -41,7 +46,7 @@ window.addEventListener('DOMContentLoaded',function(){
     function init() {
 
         container = document.getElementById('render-box');
-        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 2000);
+        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
      		window.camera = camera
         scene = new THREE.Scene();
         window.scene = scene;
@@ -119,8 +124,12 @@ window.addEventListener('DOMContentLoaded',function(){
 
         render();
         stats.update();
+        // if(globalUnimog) {
+        //   display.textContent = `${globalUnimog.position.x.toFixed(3)}, ${globalUnimog.position.y.toFixed(3)}, ${globalUnimog.position.z.toFixed(3)}`
+        // }
+
         if(globalUnimog) {
-          display.textContent = `${globalUnimog.position.x.toFixed(3)}, ${globalUnimog.position.y.toFixed(3)}, ${globalUnimog.position.z.toFixed(3)}`
+          displayPosition.textContent = `${globalUnimog.position.x.toFixed(3)}, ${globalUnimog.position.y.toFixed(3)}, ${globalUnimog.position.z.toFixed(3)}`
         }
 
     }
@@ -171,6 +180,7 @@ window.addEventListener('DOMContentLoaded',function(){
             var desiredFactor = uniformScale(desiredVolume,object);
             object.scale.multiplyScalar(desiredFactor);
             scene.add(object);
+            displayUnimogModel.textContent = model;
         });
     }
 
@@ -219,3 +229,35 @@ window.addEventListener('DOMContentLoaded',function(){
     window.calculateRotationDegree= calculateRotationDegree;
 
 });
+
+function getChildren(elem, given) {
+var arr = given || []
+if(elem.children.length > 0) {
+	for(let i =0; i < elem.children.length; i++) {
+		getChildren(elem.children[i],arr)
+	}
+} else {
+arr.push(elem)
+}
+
+return arr;
+}
+
+function explode(val) {
+  children = getChildren(globalUnimog);
+  for(var i = 0; i < children.length; i++) {
+    var elem = children[i];
+    var v = new THREE.Vector3();
+    v.copy(elem.position);
+    elem.localToWorld(v);
+    globalUnimog.worldToLocal(v);
+    coords = ['x', 'y', 'z']
+    for(let i = 0; i < coords.length; i++) {
+      if(v[coords[i]] >= 0) {
+      	elem.position[coords[i]] += 1
+      } else {
+      	elem.position[coords[i]] -= 1
+      }
+    }
+  }
+}
