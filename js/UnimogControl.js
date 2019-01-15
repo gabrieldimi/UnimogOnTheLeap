@@ -84,6 +84,11 @@ window.addEventListener('DOMContentLoaded',function(){
             cube = object;
             var desiredFactor = uniformScale(600,object);
             object.scale.multiplyScalar(desiredFactor);
+            object.traverse(function(node){
+                if(node.material){
+                    node.material.side = THREE.DoubleSide;
+                }
+            });
             scene.add(object);
         });
 
@@ -107,10 +112,9 @@ window.addEventListener('DOMContentLoaded',function(){
         renderer.domElement.style.height = '100%';
         console.log(renderer)
         container.appendChild(renderer.domElement);
-        // test = {x: 0.000000000000000000000000000000000000000000000000000000000000000000000001, y: 0.000000000000000000000000000000000000000001, z:0.000000000000000000000000000000000000000000000000001}
-        // camera.position.z = test.z
-        // camera.position.y = test.y
-        // camera.position.x = test.x
+        camera.position.x = 0.1;
+        camera.position.y = 0.1;
+        camera.position.z = 0.1;
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
 
