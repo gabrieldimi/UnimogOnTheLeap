@@ -28,7 +28,6 @@ TODO change camera position
 */
 var io = io();
 var zGlobal = 0;
-<<<<<<< HEAD
 var zRotationChange = 0.01;
 
 //Desired volumes for scene objects
@@ -41,12 +40,6 @@ var globalUnimog;
 var unimogCube;
 var unimogLogo;
 
-=======
-var desiredVolume = 200;
-var globalUnimog;
-var zRotationChange = 0.01;
-var cube;
->>>>>>> cab71b1a37024ec95e5050657132b287b14f4aef
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
@@ -172,27 +165,23 @@ window.addEventListener('DOMContentLoaded',function(){
 
     function render() {
           effect.render(scene, camera);
-          // renderer.render(scene, camera)
     }
 
     function translateModel(coord,container){
         if(uncovered){
-        //   globalUnimog.position.x += coord.x / 1000;
           globalUnimog.position.y += coord.y / 1000;
-        //   globalUnimog.position.z += coord.z / 1000;
         }
     }
 
 
-    function rotateModel(direction,x,y,radius){
-        // var zLokal = calculateRotationDegree(x,y,radius);
-        // delta = Math.max(zLokal,zGlobal) - Math.min(zLokal, zGlobal)
-        if(direction){
-            globalUnimog.rotation.z += zRotationChange;
-        }else{
-            globalUnimog.rotation.z -= zRotationChange;
+    function rotateModel(direction){
+        if(uncovered){
+            if(direction){
+                globalUnimog.rotation.z += zRotationChange;
+            }else{
+                globalUnimog.rotation.z -= zRotationChange;
+            }
         }
-        // zGlobal = zLokal;
     }
 
     function changeModel(modelInformation){
@@ -205,6 +194,7 @@ window.addEventListener('DOMContentLoaded',function(){
                 'model': 'gaggenauCube.json'
             }
             loadModel(cubeModelJson);
+            loadModel(modelInformation);
             
         }else if(uncovered){
             scene.remove(window.globalUnimog);
