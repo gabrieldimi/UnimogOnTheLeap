@@ -248,7 +248,7 @@ window.addEventListener('DOMContentLoaded',function(){
         globalUnimog.rotation.x = 0;
         globalUnimog.rotation.y = 0;
         globalUnimog.rotation.z = 0;
-        var desiredFactor = uniformScale(desiredVolume,globalUnimog);
+        var desiredFactor = uniformScale(unimogDesiredVolume,globalUnimog);
         globalUnimog.scale.multiplyScalar(desiredFactor);
         console.log("unimog's position reseted");
     }
