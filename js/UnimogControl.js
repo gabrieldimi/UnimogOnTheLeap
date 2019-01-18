@@ -29,6 +29,7 @@ TODO change camera position
 var io = io();
 var zGlobal = 0;
 var zRotationChange = 0.01;
+var maxExplodeValue = 10;
 
 //Desired volumes for scene objects
 var unimogDesiredVolume = 200;
@@ -272,11 +273,13 @@ window.addEventListener('DOMContentLoaded',function(){
         explodeModel(unimogCube,percentage);
         if(percentage >= 0.5){
             uncovered = true;
+        }else if(percentage = 0.95){
+            scene.remove('cube');
         }
     }
-    
+
     function explodeModel(model,multiplier) {
-        var val = multiplier * 400;
+        var val = multiplier * maxExplodeValue;
         model.traverse ( function (child) {
           var v = new THREE.Vector3();
           v.copy(child.position);
