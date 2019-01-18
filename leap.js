@@ -113,9 +113,10 @@ function handleReset(hands) {
   //reset timeout is in micros, NOTE: Externalized value
   if(resetBool && (!previousReset || (globalFrame.timestamp - previousReset >= settings.resetTimeout))) {
     previousReset = globalFrame.timestamp;
-    gSocket.emit('resetModel');
+    console.log("RESET")
+    // gSocket.emit('resetModel');
   }
-  //console.log(distance);
+  console.log(distance);
 }
 
 function handlePullApart(hands) {
@@ -214,18 +215,20 @@ function handleCircle(gesture) {
     clockwise = direction(gesture);
     console.log('START Circling, Clockwise:', clockwise)
   } else if(gesture.state == 'update') {
-        pointableIds = gesture.pointableIds;
-        pointableIds.forEach(function(pointableId) {
-        var pointable = globalFrame.pointable(pointableId);
-        console.log(`center: ${gesture.center}, radius: ${gesture.radius}`)
-        console.log(pointable.stabilizedTipPosition)
-        input = [0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius]
-        console.log(input)
+        // pointableIds = gesture.pointableIds;
+        // pointableIds.forEach(function(pointableId) {
+        // var pointable = globalFrame.pointable(pointableId);
+        // console.log(`center: ${gesture.center}, radius: ${gesture.radius}`)
+        // console.log(pointable.stabilizedTipPosition)
+        // input = [0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius]
+        // console.log(input)
+        console.log('update' + globalFrame.timestamp)
         if(isConnected) {
-          gSocket.emit('rotateModel', 0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius); //NOTE: externalized value: circle.multiplier
+          gSocket.emit('rotateModel', 0); //NOTE: externalized value: circle.multiplier
+          console.log('emitted rotation')
 		  //console.error(`[${pointable.tipPosition[0] - gesture.center[0]}, ${pointable.tipPosition[1] - gesture.center[1]}, ${gesture.radius}]`)
-		}
-      });
+		    }
+      // });
     } else if(gesture.state == 'stop') {
       console.log('END')
     }

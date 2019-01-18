@@ -28,7 +28,8 @@ TODO change camera position
 */
 var io = io();
 var zGlobal = 0;
-var zRotationChange = 5;
+<<<<<<< HEAD
+var zRotationChange = 0.01;
 
 //Desired volumes for scene objects
 var unimogDesiredVolume = 200;
@@ -40,6 +41,12 @@ var globalUnimog;
 var unimogCube;
 var unimogLogo;
 
+=======
+var desiredVolume = 200;
+var globalUnimog;
+var zRotationChange = 0.01;
+var cube;
+>>>>>>> cab71b1a37024ec95e5050657132b287b14f4aef
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
