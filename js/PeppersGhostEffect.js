@@ -26,6 +26,13 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 	// Initialization
 	renderer.autoClear = false;
 
+	this.ecm = function(camera) {
+		scene.updateMatrixWorld();
+
+		if ( camera.parent === null ) camera.updateMatrixWorld();
+		camera.matrixWorld.decompose( _position, _quaternion, _scale );
+	}
+
 	this.setSize = function ( width, height ) {
 
 		_halfWidth = width / 2;
@@ -49,8 +56,6 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
-
-		//camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
 		// front
 		_cameraB.position.copy( _position );

@@ -1,16 +1,17 @@
 {
-  "swipe": false,
+  "swipe": true,
   "circle": false,
   "translation": false,
-  "reset": true,
-  "pullApart": false,
+  "reset": false,
+  "pullApart": true,
   "frametime": 16666,
-  "grabStrength": 1,
+  "grabStrength": 0.5,
   "uncover": {
     "minThreshold": 155,
     "triggerThreshold": 300
   },
   "resetThresholds": [50, 40, 40],
+  "explodeThresholds": [170, 40, 40],
   "resetTimeout": 1000000,
   "gesture": {
     "swipe": {
