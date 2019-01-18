@@ -53,6 +53,10 @@ gSocket = null
 models = fs.readdirSync('./models/');
 settingsFile = fs.readFileSync('./parameters.json')
 modelIndex = 0;
+modelInformation = {
+  "type": 'unimog',
+  "model": ''
+}
 settings = JSON.parse(settingsFile);
 console.log(models)
 
@@ -74,6 +78,11 @@ io.on('connection', function(socket) {
 app.get('/', function(req, res) {
 	console.log("Client IP: " + req.connection.remoteAddress)
 	res.sendFile(__dirname + '/index.html');
+});
+
+app.get('/welcome.htm', function(req, res) {
+	console.log("Client IP: " + req.connection.remoteAddress)
+	res.sendFile(__dirname + '/welcome.htm');
 });
 
 function handleTranslation(frame) {
@@ -99,7 +108,7 @@ A further check is made to ensure that a reset is not triggered more than once a
 Uses settings.resetThresholds and settings.resetTimeout
 */
 function handleReset(hands) {
-  resetBool = true;
+  var resetBool = true;
   h1 = hands[0].palmPosition
   h2 = hands[1].palmPosition
   distance = [];
@@ -114,56 +123,58 @@ function handleReset(hands) {
   if(resetBool && (!previousReset || (globalFrame.timestamp - previousReset >= settings.resetTimeout))) {
     previousReset = globalFrame.timestamp;
     console.log("RESET")
-    // gSocket.emit('resetModel');
+    gSocket.emit('resetModel');
   }
   console.log(distance);
 }
 
-function handlePullApart(hands) {
-  console.log(`
-    ----------------
-    ${globalFrame.timestamp}
-    left hand fingers
-    ----------------`)
-    fingersLeft = hands[0].fingers
-    fingersRight = hands[1].fingers
-    var fourExtension = true;
-    for(var i =0; i < fingersLeft.length; i++) {
-      console.log(`${fingersLeft[i].type}, extended? ${fingersLeft[i].extended}` )
-      if(fingersLeft[i].type === 1 || fingersLeft[i].type === 2) {
-        fourExtension = fourExtension && fingersLeft[i].extended
-      }
-      if(fingersLeft[i].type !== 1 && fingersLeft[i].type !== 2) {
-        fourExtension = fourExtension && !fingersLeft[i].extended
-      }
-    }
-    console.log(`
-      ----------------
-      right hand fingers
-      ----------------`)
-    for(var i =0; i < fingersRight.length; i++) {
-      console.log(`${fingersRight[i].type}, extended? ${fingersRight[i].extended}` )
-      if(fingersRight[i].type === 1 || fingersRight[i].type === 2) {
-        fourExtension = fourExtension && fingersRight[i].extended
-      }
-      if(fingersRight[i].type !== 1 && fingersRight[i].type !== 2) {
-        fourExtension = fourExtension && !fingersRight[i].extended
+function handleExplode(hands) {
+  var distanceX = Math.abs(hands[0].palmPosition[0] - hands[1].palmPosition[0]);
+  console.log(`distanceX: ${distanceX}`)
+  if(distanceX < 100) {
+    distanceX = 100
+  } else if(distanceX > 400) {
+    distanceX = 400;
+  }
+  var percentage = (distanceX - 100) / 300;
+  console.log(`percentage: ${percentage}`)
+  gSocket.emit('uncoverModel', percentage)
+}
+
+//FIXME: DUPLICATE
+function fistProximity(hands) {
+  if(!pullStart) {
+    var fistBool = true;
+    h1 = hands[0].palmPosition
+    h2 = hands[1].palmPosition
+    distance = [];
+    for(var i = 0; i < 3; i++) {
+      distance[i] = Math.abs(h1[i] - h2[i]).toFixed(2)
+      //NOTE: externalized value
+      if(distance[i] >= settings.explodeThresholds[i]) {
+        fistBool = fistBool && false;
       }
     }
-    if(fourExtension) {
-      distance = Math.abs(hands[0].palmPosition[0] - hands[1].palmPosition[0]);
-      if(distance <= settings.uncover.minThreshold) {
-        console.log('pullSTART')
-        pullStart = true;
-        return;
-      }
-      console.log(`distance: ${distance}`)
-      if(distance >= settings.uncover.triggerThreshold && pullStart) {
-        pullStart = false;
-        console.log('uncover event')
-        gSocket.emit('uncoverModel')
-      }
+    if(fistBool) {
+      pullStart = true;
     }
+    console.log(`fistBool: ${fistBool}`)
+  } else {
+    handleExplode(hands);
+  }
+}
+
+function twoHands(frame) {
+  if(frame.hands[0].grabStrength >= settings.grabStrength && frame.hands[1].grabStrength >= settings.grabStrength) {
+    if(settings.pullApart) {
+      // handlePullApart(frame.hands);
+      fistProximity(frame.hands);
+    }
+  } else {
+    if(settings.reset) {
+      handleReset(frame.hands);
+    }
+  }
 }
 
 var tempFrame;
@@ -173,18 +184,13 @@ function onFrame(frame)
 	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > settings.frametime))) {
     tempFrame = frame;
 		if(isConnected || true) {
-       //NOTE: Externalized Value: grabStrength
-			if(frame.hands[0].grabStrength >= settings.grabStrength && settings.translation) {
-        handleTranslation(frame);
-			}
-
       if(frame.hands.length >= 2) {
-        if(settings.reset) {
-          handleReset(frame.hands);
-        }
-        if(settings.pullApart) {
-          handlePullApart(frame.hands);
-        }
+        twoHands(frame)
+      } else if(frame.hands.length == 1) {
+        //NOTE: Externalized Value: grabStrength
+   			if(frame.hands[0].grabStrength >= settings.grabStrength && settings.translation) {
+           handleTranslation(frame);
+   			}
       }
 		}
 	}
@@ -244,14 +250,16 @@ function handleSwipe(gesture) {
       if(gesture.direction[0] > 0) {
         console.log('Swipe to right')
         modelIndex = (modelIndex + 1) % models.length;
-        gSocket.emit('changeModel', models[modelIndex])
+        modelInformation.model = models[modelIndex]
+        gSocket.emit('changeModel', modelInformation)
       } else {
         console.log('swipe to left')
         modelIndex--;
         if(modelIndex < 0) {
           modelIndex = models.length -1;
         }
-        gSocket.emit('changeModel', models[modelIndex])
+        modelInformation.model = models[modelIndex]
+        gSocket.emit('changeModel', modelInformation)
       }
       console.log(`changing Model to ${models[modelIndex]}`)
       console.log('WHOLE SWIPE', start, gesture.position)
