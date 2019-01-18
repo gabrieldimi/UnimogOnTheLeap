@@ -62,6 +62,9 @@ window.addEventListener('DOMContentLoaded',function(){
         pullApartCube(0.1);
     });
 
+    ecm = document.getElementById('setCamera');
+    ecm.addEventListener('click',setCameraMode);
+
     display = document.getElementById('displayPanel');
 
     if (WEBGL.isWebGLAvailable() === false) {
@@ -211,7 +214,7 @@ window.addEventListener('DOMContentLoaded',function(){
             switch(modelInformation.type){
                 case 'logo':
                     unimogLogo = object;
-                    object.rotation.z = Math.PI;
+                    object.rotation.z = Math.PI -0.2;
                     desiredFactor = uniformScale(logoDesiredVolume,object);
                     break;
                 case 'cube':
@@ -287,7 +290,15 @@ window.addEventListener('DOMContentLoaded',function(){
           }
     
         });
-      }
+    }
+
+    function setCameraMode(){
+        camera.x = 0.1;
+        camera.y = 0.1;
+        camera.z = 0.1;
+    }
+
+
 
     window.scene = scene;
     window.rotateModel = rotateModel;
