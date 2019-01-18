@@ -45,6 +45,7 @@ app.use(express.static('js'))
 app.use(express.static('models'))
 app.use(express.static('assets'))
 
+previousReset = undefined;
 lastFrame = null;
 pullStart = false;
 isConnected = false;
@@ -90,13 +91,31 @@ function handleTranslation(frame) {
   // }
 }
 
+/*
+This function handles the reset gesture.
+A reset is supposed to be recognized whenever the palms of both hands touch.
+This function checks if both hands have a close proximity in all axes.
+A further check is made to ensure that a reset is not triggered more than once a second.
+Uses settings.resetThresholds and settings.resetTimeout
+*/
 function handleReset(hands) {
-  console.log(`hand1Normal: ${hands[0].palmNormal}, hand2Normal: ${hands[1].palmNormal} `)
-  //NOTE: Externalized value
-  if(Math.abs(hands[0].palmNormal[1]) > settings.palmNormalThreshold && Math.abs(hands[1].palmNormal[1]) > settings.palmNormalThreshold) {
-    console.log('EMIT reset')
+  resetBool = true;
+  h1 = hands[0].palmPosition
+  h2 = hands[1].palmPosition
+  distance = [];
+  for(var i = 0; i < 3; i++) {
+    distance[i] = Math.abs(h1[i] - h2[i]).toFixed(2)
+    //NOTE: externalized value
+    if(distance[i] >= settings.resetThresholds[i]) {
+      resetBool = resetBool && false;
+    }
+  }
+  //reset timeout is in micros, NOTE: Externalized value
+  if(resetBool && (!previousReset || (globalFrame.timestamp - previousReset >= settings.resetTimeout))) {
+    previousReset = globalFrame.timestamp;
     gSocket.emit('resetModel');
   }
+  //console.log(distance);
 }
 
 function handlePullApart(hands) {
@@ -152,7 +171,7 @@ function onFrame(frame)
 	globalFrame = frame;
 	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > settings.frametime))) {
     tempFrame = frame;
-		if(isConnected) {
+		if(isConnected || true) {
        //NOTE: Externalized Value: grabStrength
 			if(frame.hands[0].grabStrength >= settings.grabStrength && settings.translation) {
         handleTranslation(frame);
