@@ -28,6 +28,8 @@ TODO change camera position
 */
 var io = io();
 var zGlobal = 0;
+var effect;
+
 var zRotationChange = 0.01;
 var maxExplodeValue = 10;
 
@@ -74,7 +76,7 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     var container, stats, clock;
-    var camera, scene, renderer, effect;
+    var camera, scene, renderer;
     var uncovered = false;
     var loader = new THREE.AssimpJSONLoader();
 
@@ -293,9 +295,10 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function setCameraMode(){
-        camera.x = 0.1;
-        camera.y = 0.1;
-        camera.z = 0.1;
+        camera.position.x = 0.1;
+        camera.position.y = 0.1;
+        camera.position.z = 0.1;
+        effect.ecm(camera.position);
     }
 
 
