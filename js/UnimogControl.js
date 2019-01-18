@@ -233,6 +233,7 @@ window.addEventListener('DOMContentLoaded',function(){
                     break;
                 case 'unimog':
                     globalUnimog = object; 
+                    console.log( new THREE.Box3().setFromObject(globalUnimog).getSize());
                     desiredFactor = uniformScale(unimogDesiredVolume,object);
                     break;
             }
