@@ -32,7 +32,7 @@ var zRotationChange = 0.01;
 var maxExplodeValue = 10;
 
 //Desired volumes for scene objects
-var unimogDesiredVolume = 200;
+var unimogDesiredVolume = 3000;
 var logoDesiredVolume = 2000;
 var cubeDesiredVolume = 600;
 
