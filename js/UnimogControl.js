@@ -297,7 +297,8 @@ window.addEventListener('DOMContentLoaded',function(){
         camera.position.x = 0.1;
         camera.position.y = 0.1;
         camera.position.z = 0.1;
-        effect.ecm(camera);
+        effect.ecm();
+        effect.render(scene,camera);
     }
 
 
