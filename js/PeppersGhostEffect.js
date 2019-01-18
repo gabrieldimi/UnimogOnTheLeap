@@ -36,8 +36,8 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 
 		} else {
 
-			_width = height / 3;
-			_height = height / 3;
+			_width = height / 2.5;
+			_height = height / 2.5;
 
 		}
 		renderer.setSize( width, height );
@@ -53,32 +53,35 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 		camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
 		// front
-		_cameraF.position.copy( _position );
-		_cameraF.quaternion.copy( _quaternion );
-		_cameraF.translateZ( scope.cameraDistance );
-		_cameraF.lookAt( scene.position );
-
-		// back
 		_cameraB.position.copy( _position );
 		_cameraB.quaternion.copy( _quaternion );
-	//	_cameraB.translateZ( - ( scope.cameraDistance ) );
-    _cameraB.translateZ( scope.cameraDistance );
+		_cameraB.translateZ( scope.cameraDistance );
+		// _cameraF.rotation.y += 270 * ( Math.PI / 180 );
+		_cameraB.rotation.z += 180  * ( Math.PI / 180 );
+		window.cf = _cameraF;
 		_cameraB.lookAt( scene.position );
-	  _cameraB.rotation.z += 180 * ( Math.PI / 180 );
+
+		// back
+		_cameraF.position.copy( _position );
+		_cameraF.quaternion.copy( _quaternion );
+	//	_cameraB.translateZ( - ( scope.cameraDistance ) );
+    _cameraF.translateZ( scope.cameraDistance );
+		_cameraF.lookAt( scene.position );
+	  _cameraF.rotation.z += 180 * ( Math.PI / 180 );
 
 		// left
 		_cameraL.position.copy( _position );
 		_cameraL.quaternion.copy( _quaternion );
 		_cameraL.translateZ( scope.cameraDistance );
 		_cameraL.lookAt( scene.position );
-		_cameraL.rotation.z += 90 * ( Math.PI / 180 );
+		_cameraL.rotation.z += 270 * ( Math.PI / 180 );
 
 		// right
 		_cameraR.position.copy( _position );
 		_cameraR.quaternion.copy( _quaternion );
 		_cameraR.translateZ( scope.cameraDistance );
 		_cameraR.lookAt( scene.position );
-		_cameraR.rotation.z -= 90 * ( Math.PI / 180 );
+		_cameraR.rotation.z -= 270 * ( Math.PI / 180 );
 
 
 		renderer.clear();
