@@ -34,7 +34,6 @@ var maxExplodeValue = 10;
 //Desired volumes for scene objects
 var unimogDesiredVolume = 3000;
 var logoDesiredVolume = 2000;
-var cubeDesiredVolume = 600;
 
 //Variables for scene objects
 var globalUnimog;
@@ -104,8 +103,6 @@ window.addEventListener('DOMContentLoaded',function(){
         directionalLight.position.normalize();
         scene.add(directionalLight);
 
-        //
-
         renderer = new THREE.WebGLRenderer();
         window.renderer = renderer;
         renderer.setPixelRatio(window.devicePixelRatio);
@@ -122,12 +119,9 @@ window.addEventListener('DOMContentLoaded',function(){
 
         controls.update();
 
-        //
 
         stats = new Stats();
         container.appendChild(stats.dom);
-
-        //
 
         window.addEventListener('resize', onWindowResize, false);
 
@@ -196,8 +190,8 @@ window.addEventListener('DOMContentLoaded',function(){
                 'type': 'cube',
                 'model': 'gaggenauCube.json'
             }
-            loadModel(cubeModelJson);
             loadModel(modelInformation);
+            loadModel(cubeModelJson);
             
         }else if(uncovered){
             scene.remove(window.globalUnimog);
@@ -229,7 +223,13 @@ window.addEventListener('DOMContentLoaded',function(){
                             child.material.side = THREE.DoubleSide;
                         }
                     });
-                    desiredFactor = uniformScale(cubeDesiredVolume,object);
+                    var size = new THREE.Box3().setFromObject(globalUnimog).getSize();
+                    var maxValueLength = Math.max(size.x,size.y,size.z);
+                    object.scale.x = 1;
+                    object.scale.y = 1;
+                    object.scale.z = 1;
+                    var desiredFactor = Math.pow(maxValueLength,3) ;
+
                     break;
                 case 'unimog':
                     globalUnimog = object; 
