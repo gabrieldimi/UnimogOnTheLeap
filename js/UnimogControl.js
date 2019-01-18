@@ -34,6 +34,7 @@ var maxExplodeValue = 10;
 //Desired volumes for scene objects
 var unimogDesiredVolume = 3000;
 var logoDesiredVolume = 2000;
+var cubeDesiredVolume = Math.pow(22,3);
 
 //Variables for scene objects
 var globalUnimog;
@@ -223,17 +224,15 @@ window.addEventListener('DOMContentLoaded',function(){
                             child.material.side = THREE.DoubleSide;
                         }
                     });
-                    var size = new THREE.Box3().setFromObject(globalUnimog).getSize();
-                    var maxValueLength = Math.max(size.x,size.y,size.z);
                     object.scale.x = 1;
                     object.scale.y = 1;
                     object.scale.z = 1;
-                    desiredFactor = Math.pow(maxValueLength,3) ;
+                    desiredFactor = 22;
 
                     break;
                 case 'unimog':
                     globalUnimog = object; 
-                    console.log( new THREE.Box3().setFromObject(globalUnimog).getSize());
+                    console.log( new THREE.Box3().setFromObject(globalUnimog).getSize(););
                     desiredFactor = uniformScale(unimogDesiredVolume,object);
                     break;
             }
