@@ -30,6 +30,7 @@ var io = io();
 var zGlobal = 0;
 var desiredVolume = 200;
 var globalUnimog;
+var zRotationChange = 5;
 var cube;
 window.addEventListener('DOMContentLoaded',function(){
 
@@ -181,14 +182,14 @@ window.addEventListener('DOMContentLoaded',function(){
 
 
     function rotateModel(direction,x,y,radius){
-        var zLokal = calculateRotationDegree(x,y,radius);
-        delta = Math.max(zLokal,zGlobal) - Math.min(zLokal, zGlobal)
+        // var zLokal = calculateRotationDegree(x,y,radius);
+        // delta = Math.max(zLokal,zGlobal) - Math.min(zLokal, zGlobal)
         if(direction){
-            globalUnimog.rotation.z += (delta) / 1000;
+            globalUnimog.rotation.z += zRotationChange;
         }else{
-            globalUnimog.rotation.z -= (delta) / 1000;
+            globalUnimog.rotation.z -= zRotationChange;
         }
-        zGlobal = zLokal;
+        // zGlobal = zLokal;
     }
 
     function changeModel(nextModelUrl){
