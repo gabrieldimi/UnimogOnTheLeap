@@ -30,7 +30,7 @@ var io = io();
 var zGlobal = 0;
 var desiredVolume = 200;
 var globalUnimog;
-var zRotationChange = 5;
+var zRotationChange = 0.01;
 var cube;
 window.addEventListener('DOMContentLoaded',function(){
 
