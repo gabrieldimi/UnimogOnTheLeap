@@ -34,7 +34,7 @@ var maxExplodeValue = 10;
 //Desired volumes for scene objects
 var unimogDesiredVolume = 3000;
 var logoDesiredVolume = 2000;
-var cubeDesiredVolume = Math.pow(22,3);
+var cubeDesiredVolume = 3500;
 
 //Variables for scene objects
 var globalUnimog;
@@ -224,10 +224,7 @@ window.addEventListener('DOMContentLoaded',function(){
                             child.material.side = THREE.DoubleSide;
                         }
                     });
-                    object.scale.x = 1;
-                    object.scale.y = 1;
-                    object.scale.z = 1;
-                    desiredFactor = 22;
+                    desiredFactor = uniformScale(cubeDesiredVolume,object);
 
                     break;
                 case 'unimog':
