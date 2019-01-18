@@ -28,10 +28,18 @@ TODO change camera position
 */
 var io = io();
 var zGlobal = 0;
-var desiredVolume = 200;
-var globalUnimog;
 var zRotationChange = 5;
-var cube;
+
+//Desired volumes for scene objects
+var unimogDesiredVolume = 200;
+var logoDesiredVolume = 2000;
+var cubeDesiredVolume = 600;
+
+//Variables for scene objects
+var globalUnimog;
+var unimogCube;
+var unimogLogo;
+
 window.addEventListener('DOMContentLoaded',function(){
 
     io.on('translateModel', translateModel);
@@ -73,27 +81,17 @@ window.addEventListener('DOMContentLoaded',function(){
 
         container = document.getElementById('render-box');
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
-     		window.camera = camera
+     	window.camera = camera;
         scene = new THREE.Scene();
         window.scene = scene;
 
-        // load unimog model
-        loadModel('unimog.min.json',globalUnimog);
-        // loadModel('gaggenauCube.json',cube);
 
-        loader.load('gaggenauCube.json', function (object) {
-            cube = object;
-            var desiredFactor = uniformScale(600,object);
-            object.scale.multiplyScalar(desiredFactor);
-            object.traverse(function(node){
-                if(node.material){
-                    node.material.side = THREE.DoubleSide;
-                }
-            });
-            scene.add(object);
-        });
-
-
+        // load unimog logo 
+        logoModelJson = {
+            'type': 'logo',
+            'model': 'logoGaggenau.json'
+        }
+        loadModel(logoModelJson);
 
         var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
         scene.add(ambientLight);
@@ -190,9 +188,21 @@ window.addEventListener('DOMContentLoaded',function(){
         // zGlobal = zLokal;
     }
 
-    function changeModel(nextModelUrl){
-        scene.remove(window.globalUnimog);
-        loadModel(nextModelUrl);
+    function changeModel(modelInformation){
+        if(scene.getObjectByName('logo')){
+            scene.remove(window.unimogLogo);
+
+            // load unimog cube 
+            var cubeModelJson ={
+                'type': 'cube',
+                'model': 'gaggenauCube.json'
+            }
+            loadModel(cubeModelJson);
+            
+        }else if(uncovered){
+            scene.remove(window.globalUnimog);
+            loadModel(modelInformation);
+        }     
     }
 
 
@@ -202,13 +212,28 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
 
-    function loadModel(model){
-        loader.load(model, function (object) {
-            globalUnimog = object;
-            var desiredFactor = uniformScale(desiredVolume,object);
+    function loadModel(modelInformation){
+        loader.load(modelInformation.model, function (object) {
+            object.name = modelInformation.type;
+            
+            var desiredFactor;
+            switch(modelInformation.type){
+                case 'logo':
+                    unimogLogo = object;
+                    desiredFactor = uniformScale(logoDesiredVolume,object);
+                    break;
+                case 'cube':
+                    unimogCube = object;
+                    desiredFactor = uniformScale(cubeDesiredVolume,object);
+                    break;
+                case 'unimog':
+                    globalUnimog = object; 
+                    desiredFactor = uniformScale(unimogDesiredVolume,object);
+                    break;
+            }
             object.scale.multiplyScalar(desiredFactor);
             scene.add(object);
-            displayUnimogModel.textContent = model;
+            displayUnimogModel.textContent = modelInformation.model;
         });
     }
 
@@ -240,13 +265,13 @@ window.addEventListener('DOMContentLoaded',function(){
 
 
     function pullApartCube(){
-        if(cube && Math.abs(cube.children[0].position.x - cube.children[1].position.x) <= 20){
-          cube.children[0].position.x -=10;
-          cube.children[1].position.x +=10;
-          uncovered = true;
+        if(unimogCube && Math.abs(unimogCube.children[0].position.x - unimogCube.children[1].position.x) <= 20){
+            unimogCube.children[0].position.x -=10;
+            unimogCube.children[1].position.x +=10;
         }else{
-          scene.remove(cube);
-          console.log("cube removed")
+          scene.remove(unimogCube);
+          uncovered = true;
+          console.log("unimog cube removed")
         }
 
     }
@@ -254,6 +279,7 @@ window.addEventListener('DOMContentLoaded',function(){
 
     window.scene = scene;
     window.rotateModel = rotateModel;
+    window.changeModel = changeModel;
     window.calculateRotationDegree= calculateRotationDegree;
 
 });
