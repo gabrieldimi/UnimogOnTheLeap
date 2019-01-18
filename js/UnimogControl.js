@@ -57,7 +57,9 @@ window.addEventListener('DOMContentLoaded',function(){
     displayPosition = document.getElementById('unimogPosition');
     displayUnimogModel = document.getElementById('unimogModel');
     uncover = document.getElementById('uncover');
-    uncover.addEventListener('click', pullApartCube)
+    uncover.addEventListener('click', function(){
+        pullApartCube(0.1);
+    });
 
     display = document.getElementById('displayPanel');
 
@@ -221,6 +223,11 @@ window.addEventListener('DOMContentLoaded',function(){
                     break;
                 case 'cube':
                     unimogCube = object;
+                    object.traverse(function (child){
+                        if(child.material){
+                            child.material.side = THREE.DoubleSide;
+                        }
+                    });
                     desiredFactor = uniformScale(cubeDesiredVolume,object);
                     break;
                 case 'unimog':
@@ -261,54 +268,35 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
 
-    function pullApartCube(){
-        if(unimogCube && Math.abs(unimogCube.children[0].position.x - unimogCube.children[1].position.x) <= 20){
-            unimogCube.children[0].position.x -=10;
-            unimogCube.children[1].position.x +=10;
-        }else{
-          scene.remove(unimogCube);
-          uncovered = true;
-          console.log("unimog cube removed")
+    function pullApartCube(percentage){
+        explodeModel(unimogCube,percentage);
+        if(percentage >= 0.5){
+            uncovered = true;
         }
-
     }
-
+    
+    function explodeModel(model,multiplier) {
+        var val = multiplier * 400;
+        model.traverse ( function (child) {
+          var v = new THREE.Vector3();
+          v.copy(child.position);
+          child.localToWorld(v);
+          model.worldToLocal(v);
+          coords = ['x', 'y', 'z']
+          for(let i = 0; i < coords.length; i++) {
+            if(v[coords[i]] >= 0) {
+                child.position[coords[i]] = val
+            } else {
+                child.position[coords[i]] = -val
+            }
+          }
+    
+        });
+      }
 
     window.scene = scene;
     window.rotateModel = rotateModel;
     window.changeModel = changeModel;
-    window.calculateRotationDegree= calculateRotationDegree;
+    window.explode = explodeModel;
 
 });
-
-function getChildren(elem, given) {
-var arr = given || []
-if(elem.children.length > 0) {
-	for(let i =0; i < elem.children.length; i++) {
-		getChildren(elem.children[i],arr)
-	}
-} else {
-arr.push(elem)
-}
-
-return arr;
-}
-
-function explode(val) {
-  children = getChildren(globalUnimog);
-  for(var i = 0; i < children.length; i++) {
-    var elem = children[i];
-    var v = new THREE.Vector3();
-    v.copy(elem.position);
-    elem.localToWorld(v);
-    globalUnimog.worldToLocal(v);
-    coords = ['x', 'y', 'z']
-    for(let i = 0; i < coords.length; i++) {
-      if(v[coords[i]] >= 0) {
-      	elem.position[coords[i]] += 1
-      } else {
-      	elem.position[coords[i]] -= 1
-      }
-    }
-  }
-}
