@@ -228,7 +228,7 @@ window.addEventListener('DOMContentLoaded',function(){
                     object.scale.x = 1;
                     object.scale.y = 1;
                     object.scale.z = 1;
-                    var desiredFactor = Math.pow(maxValueLength,3) ;
+                    desiredFactor = Math.pow(maxValueLength,3) ;
 
                     break;
                 case 'unimog':
