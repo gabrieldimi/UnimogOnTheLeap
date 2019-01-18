@@ -29,7 +29,6 @@ TODO change camera position
 var io = io();
 var zGlobal = 0;
 var effect;
-
 var zRotationChange = 0.01;
 var maxExplodeValue = 10;
 
@@ -298,7 +297,7 @@ window.addEventListener('DOMContentLoaded',function(){
         camera.position.x = 0.1;
         camera.position.y = 0.1;
         camera.position.z = 0.1;
-        effect.ecm(camera.position);
+        effect.ecm(camera);
     }
 
 
