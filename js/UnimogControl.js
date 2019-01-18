@@ -172,11 +172,9 @@ window.addEventListener('DOMContentLoaded',function(){
 
     function translateModel(coord,container){
         if(uncovered){
-          globalUnimog.position.x += coord.x / 1000;
+        //   globalUnimog.position.x += coord.x / 1000;
           globalUnimog.position.y += coord.y / 1000;
-
-              globalUnimog.position.z += coord.z / 1000;
-
+        //   globalUnimog.position.z += coord.z / 1000;
         }
     }
 
