@@ -112,10 +112,6 @@ window.addEventListener('DOMContentLoaded',function(){
         renderer.domElement.style.height = '100%';
         console.log(renderer)
         container.appendChild(renderer.domElement);
-        camera.position.x = 0.1;
-        camera.position.y = 0.1;
-        camera.position.z = 0.1;
-
         controls = new THREE.OrbitControls(camera, renderer.domElement);
 
         controls.update();
@@ -215,6 +211,7 @@ window.addEventListener('DOMContentLoaded',function(){
             switch(modelInformation.type){
                 case 'logo':
                     unimogLogo = object;
+                    object.rotation.z = Math.PI;
                     desiredFactor = uniformScale(logoDesiredVolume,object);
                     break;
                 case 'cube':
@@ -225,7 +222,6 @@ window.addEventListener('DOMContentLoaded',function(){
                         }
                     });
                     desiredFactor = uniformScale(cubeDesiredVolume,object);
-
                     break;
                 case 'unimog':
                     globalUnimog = object; 
