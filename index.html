@@ -24,11 +24,34 @@
 				width: 100%;
 				height: 100%;
 			}
+
+			#start {
+				background: #fff;
+				position: fixed;
+				z-index: 100000000;
+				width: 100%;
+				height: 100%;
+				border: 0;
+				transition: all 1s;
+				display:none;
+			}
 		</style>
+		<script>
+			var iframe;
+			window.addEventListener('DOMContentLoaded', function() {
+				iframe = document.getElementById('start');
+
+			})
+			function fadeOut() {
+				console.log(iframe)
+				iframe.style.transform = 'translateX(-10000px)';
+			}
+		</script>
 
 	</head>
 
 	<body>
+	<iframe src='/welcome.htm' id='start'></iframe>
 	<div id="render-box" style='overflow:hidden; width: 100%; height: 100%;'>
 			<div id='displayPanel' style='position:fixed; right: 25px; top:0; color: #fff'>
 				<div id='displayPanel' style='position:fixed; right: 5px; top:0; color: #fff'>

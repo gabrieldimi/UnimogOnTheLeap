@@ -50,7 +50,7 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		camera.matrixWorld.decompose( _position, _quaternion, _scale );
+		//camera.matrixWorld.decompose( _position, _quaternion, _scale );
 
 		// front
 		_cameraB.position.copy( _position );
