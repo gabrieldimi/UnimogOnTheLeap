@@ -29,6 +29,7 @@ TODO change camera position
 var io = io();
 var zGlobal = 0;
 var effect;
+var continueToPepper = false;
 var zRotationChange = 0.01;
 var maxExplodeValue = 10;
 
@@ -183,21 +184,29 @@ window.addEventListener('DOMContentLoaded',function(){
     }
 
     function changeModel(modelInformation){
-        if(scene.getObjectByName('logo')){
-            scene.remove(window.unimogLogo);
 
-            // load unimog cube 
-            var cubeModelJson ={
-                'type': 'cube',
-                'model': 'gaggenauCube.json'
-            }
-            loadModel(modelInformation);
-            loadModel(cubeModelJson);
-            
-        }else if(uncovered){
-            scene.remove(window.globalUnimog);
-            loadModel(modelInformation);
-        }     
+        if(!continueToPepper){
+            fadeOut();
+            continueToPepper = true;
+        }else{
+
+            if(scene.getObjectByName('logo')){
+                scene.remove(window.unimogLogo);
+    
+                // load unimog cube 
+                var cubeModelJson ={
+                    'type': 'cube',
+                    'model': 'gaggenauCube.json'
+                }
+                loadModel(modelInformation);
+                loadModel(cubeModelJson);
+                
+            }else if(uncovered){
+                scene.remove(window.globalUnimog);
+                loadModel(modelInformation);
+            }     
+        }
+        
     }
 
 
