@@ -34,7 +34,7 @@ var maxExplodeValue = 10;
 //Desired volumes for scene objects
 var unimogDesiredVolume = 3000;
 var logoDesiredVolume = 2000;
-var cubeDesiredVolume = 3500;
+var cubeDesiredVolume = 9261;
 
 //Variables for scene objects
 var globalUnimog;
