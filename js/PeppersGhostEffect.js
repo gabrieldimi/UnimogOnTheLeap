@@ -43,8 +43,8 @@ THREE.PeppersGhostEffect = function ( renderer ) {
 
 		} else {
 
-			_width = height / 2.5;
-			_height = height / 2.5;
+			_width = height / 3;
+			_height = height / 3;
 
 		}
 		renderer.setSize( width, height );

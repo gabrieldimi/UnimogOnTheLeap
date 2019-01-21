@@ -31,7 +31,7 @@ var zGlobal = 0;
 var effect;
 var continueToPepper = false;
 var zRotationChange = 0.01;
-var maxExplodeValue = 10;
+var maxExplodeValue = 1.3;
 
 //Desired volumes for scene objects
 var unimogDesiredVolume = 3000;
@@ -94,7 +94,7 @@ window.addEventListener('DOMContentLoaded',function(){
         window.scene = scene;
 
 
-        // load unimog logo 
+        // load unimog logo
         logoModelJson = {
             'type': 'logo',
             'model': 'logoGaggenau.json'
@@ -113,7 +113,7 @@ window.addEventListener('DOMContentLoaded',function(){
         window.renderer = renderer;
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.domElement.style.width = '99.7%';
+        renderer.domElement.style.width = '100%';
         renderer.domElement.style.height = '100%';
         console.log(renderer)
         container.appendChild(renderer.domElement);
@@ -138,8 +138,9 @@ window.addEventListener('DOMContentLoaded',function(){
     function onWindowResize() {
 
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.domElement.style.width = '99.7%';
+        renderer.domElement.style.width = '100%';
         renderer.domElement.style.height = '100%';
+        effect.setSize(window.innerWidth, window.innerHeight);
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
@@ -192,21 +193,21 @@ window.addEventListener('DOMContentLoaded',function(){
 
             if(scene.getObjectByName('logo')){
                 scene.remove(window.unimogLogo);
-    
-                // load unimog cube 
+
+                // load unimog cube
                 var cubeModelJson ={
                     'type': 'cube',
-                    'model': 'gaggenauCube.json'
+                    'model': 'gaggenauCubeII.json'
                 }
                 loadModel(modelInformation);
                 loadModel(cubeModelJson);
-                
+
             }else if(uncovered){
                 scene.remove(window.globalUnimog);
                 loadModel(modelInformation);
-            }     
+            }
         }
-        
+
     }
 
 
@@ -219,7 +220,7 @@ window.addEventListener('DOMContentLoaded',function(){
     function loadModel(modelInformation){
         loader.load(modelInformation.model, function (object) {
             object.name = modelInformation.type;
-            
+
             var desiredFactor;
             switch(modelInformation.type){
                 case 'logo':
@@ -235,9 +236,22 @@ window.addEventListener('DOMContentLoaded',function(){
                         }
                     });
                     desiredFactor = uniformScale(cubeDesiredVolume,object);
+                    //Adding originalPosition to every child as a new object
+                    //so that there is no reference. Will later be used for explosion
+                    object.traverse(child => {
+                      child.userData.originalPosition = {
+                        'x': child.position.x,
+                        'y': child.position.y,
+                        'z': child.position.z
+                      };
+
+                    });
                     break;
                 case 'unimog':
-                    globalUnimog = object; 
+                    globalUnimog = object;
+                    //Unimog position adjustment, so model doesnt have to be changed
+                    object.position.y -= 2
+                    object.position.z -= 2
                     desiredFactor = uniformScale(unimogDesiredVolume,object);
                     break;
             }
@@ -276,30 +290,51 @@ window.addEventListener('DOMContentLoaded',function(){
 
     function pullApartCube(percentage){
         explodeModel(unimogCube,percentage);
-        if(percentage >= 0.5){
+        if(percentage >= 0.5 && percentage < 0.95){
             uncovered = true;
-        }else if(percentage = 0.95){
-            scene.remove('cube');
+        }else if(percentage >= 0.95){
+          console.log('imma else')
+            scene.remove(unimogCube);
         }
     }
 
     function explodeModel(model,multiplier) {
-        var val = multiplier * maxExplodeValue;
-        model.traverse ( function (child) {
-          var v = new THREE.Vector3();
-          v.copy(child.position);
-          child.localToWorld(v);
-          model.worldToLocal(v);
+        var val = 1 + multiplier * maxExplodeValue;
+        unimogCube.rotation.x = (Math.PI / 4) * multiplier
+        unimogCube.rotation.y = (Math.PI / 4) * multiplier
+        unimogCube.rotation.z = (Math.PI / 4) * multiplier
+        unimogCube.traverse(child => {
+          if(child.type !== 'Mesh') {
+          // console.log(child.getWorldPosition())
+          // var v = child.position;
+          var v = child.userData.originalPosition;
           coords = ['x', 'y', 'z']
-          for(let i = 0; i < coords.length; i++) {
-            if(v[coords[i]] >= 0) {
-                child.position[coords[i]] = val
-            } else {
-                child.position[coords[i]] = -val
+            for(let i = 0; i < coords.length; i++) {
+              if(v[coords[i]] >= 0.001 || v[coords[i]] <= -0.001 && v[coords[i]] !== 0) {
+                  // console.log(`changing ${child.name}, index: ${i}, from: ${child.position[coords[i]]}, to ${val * child.userData.originalPosition[coords[i]]}`)
+                  child.position[coords[i]] = val * child.userData.originalPosition[coords[i]]
+              }
             }
           }
-    
-        });
+        })
+
+
+
+        // model.traverse ( function (child) {
+        //   var v = new THREE.Vector3();
+        //   v.copy(child.position);
+        //   child.localToWorld(v);
+        //   model.worldToLocal(v);
+        //   coords = ['x', 'y', 'z']
+        //   for(let i = 0; i < coords.length; i++) {
+        //     if(v[coords[i]] >= 0) {
+        //         child.position[coords[i]] = val
+        //     } else {
+        //         child.position[coords[i]] = -val
+        //     }
+        //   }
+        //
+        // });
     }
 
     function setCameraMode(){

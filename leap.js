@@ -230,7 +230,7 @@ function handleCircle(gesture) {
         // console.log(input)
         console.log('update' + globalFrame.timestamp)
         if(isConnected) {
-          gSocket.emit('rotateModel', 0); //NOTE: externalized value: circle.multiplier
+          gSocket.emit('rotateModel', clockwise ? 0:1); //NOTE: externalized value: circle.multiplier
           console.log('emitted rotation')
 		  //console.error(`[${pointable.tipPosition[0] - gesture.center[0]}, ${pointable.tipPosition[1] - gesture.center[1]}, ${gesture.radius}]`)
 		    }
