@@ -21,10 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-
-/*
-TODO clockwise rotation
-*/
 const args = process.argv;
 console.log(`Starting with args: ${args}`);
 if(args.length < 3 || args[2] !== 'noleap') {
@@ -35,9 +31,11 @@ if(args.length < 3 || args[2] !== 'noleap') {
 }
 var Leap;
 var globalFrame;
+//Dependencies
 var express = require('express')
 var app = express();
 var http = require('http').Server(app);
+//used for sending frames to client
 var io = require('socket.io')(http);
 var fs = require('fs');
 
@@ -45,14 +43,40 @@ app.use(express.static('js'))
 app.use(express.static('models'))
 app.use(express.static('assets'))
 
+/**
+saves the timestamp of the previous reset to prevent
+firing too many resets
+@see handleReset()
+*/
 previousReset = undefined;
-lastFrame = null;
+/**
+Needed to differentiate between an explode event start and update
+@see fistProximity()
+*/
 pullStart = false;
+/**
+Needed to prevent excpetions when not connected to client
+*/
 isConnected = false;
+/**
+Global connection to clients
+*/
 gSocket = null
+/**
+Array containing all 3D models
+*/
 models = fs.readdirSync('./models/');
+/**
+JSON file containing settings
+*/
 settingsFile = fs.readFileSync('./parameters.json')
+/**
+Index in the array of the currently used 3D model
+*/
 modelIndex = 0;
+/**
+Information about the model for the client
+*/
 modelInformation = {
   "type": 'unimog',
   "model": ''
@@ -64,10 +88,15 @@ models.forEach(file => {
   console.log(file);
 });
 
+/**
+FIXME: NOT IMPLEMENTED.
+Used to send parameters from the client to the server
+*/
 function handleParameters(jsonString) {
   console.log(jsonString);
 }
 
+//Initializing Socket.io and server
 io.on('connection', function(socket) {
 	console.log("connected")
 	isConnected = true;
@@ -85,27 +114,25 @@ app.get('/welcome.htm', function(req, res) {
 	res.sendFile(__dirname + '/welcome.htm');
 });
 
+//FIXME: find hand with highest grabStrength
+/**
+This function sends the movement of the hand to the clients
+to translate the model
+*/
 function handleTranslation(frame) {
   gSocket.emit('translateModel', { "x" : frame.hands[0].palmVelocity[0],
-              "y" : frame.hands[0].palmVelocity[1],
-              "z": frame.hands[0].palmVelocity[2]}
-  )
-  xAbs = Math.abs(frame.hands[0].palmVelocity[0]);
-  yAbs = Math.abs(frame.hands[0].palmVelocity[1]);
-  // if(xAbs > 15) {
-    console.log(`x: ${xAbs}`);
-  // }
-  // if(yAbs > 15) {
-    console.log(`y: ${yAbs}`);
-  // }
+                                   "y" : frame.hands[0].palmVelocity[1],
+                                   "z": frame.hands[0].palmVelocity[2]}
+              )
 }
 
-/*
+/**
 This function handles the reset gesture.
 A reset is supposed to be recognized whenever the palms of both hands touch.
 This function checks if both hands have a close proximity in all axes.
 A further check is made to ensure that a reset is not triggered more than once a second.
 Uses settings.resetThresholds and settings.resetTimeout
+@see root entry point: onFrame()
 */
 function handleReset(hands) {
   var resetBool = true;
@@ -128,20 +155,29 @@ function handleReset(hands) {
   console.log(distance);
 }
 
+/**
+This function tells the client in percent how far both grabbing hands are apart
+from each other on the x-axis. This information is then used to explode a model.
+minimum and maximum distances are set in the parameters.
+@params {Object} - An object containing information about the hands
+*/
 function handleExplode(hands) {
   var distanceX = Math.abs(hands[0].palmPosition[0] - hands[1].palmPosition[0]);
   console.log(`distanceX: ${distanceX}`)
-  if(distanceX < 100) {
-    distanceX = 100
-  } else if(distanceX > 400) {
-    distanceX = 400;
+  if(distanceX < settings.gesture.explode.minDistance) {
+    distanceX = settings.gesture.explode.minDistance;
+  } else if(distanceX > settings.gesture.explode.maxDistance) {
+    distanceX = settings.gesture.explode.maxDistance;
   }
-  var percentage = (distanceX - 100) / 300;
+  var percentage = (distanceX - settings.gesture.explode.minDistance) / (settings.gesture.explode.maxDistance - settings.gesture.explode.minDistance);
   console.log(`percentage: ${percentage}`)
   gSocket.emit('uncoverModel', percentage)
 }
 
-//FIXME: DUPLICATE
+/**
+This function is used to detect the beginning of the explosion gesture.
+@param {Object} - An object containing information about the hands
+*/
 function fistProximity(hands) {
   if(!pullStart) {
     var fistBool = true;
@@ -164,10 +200,13 @@ function fistProximity(hands) {
   }
 }
 
+/**
+This functions helps to detected all two-hand gestures,
+i. e. explosion and reset.
+*/
 function twoHands(frame) {
   if(frame.hands[0].grabStrength >= settings.grabStrength && frame.hands[1].grabStrength >= settings.grabStrength) {
     if(settings.pullApart) {
-      // handlePullApart(frame.hands);
       fistProximity(frame.hands);
     }
   } else {
@@ -177,13 +216,27 @@ function twoHands(frame) {
   }
 }
 
-var tempFrame;
+/**
+Set after the first valid frame has been received to control the number
+of frames sent to the client by checking the difference timestamps.
+@see onFrame()
+*/
+var previousFrame;
+/**
+This function serves as an entry point for frames from the controller.
+As there is no way to set the number of frames received from the controller
+the timestamp between frames is checked to handle this.
+60 fps should be the targeted framerate as the client does not expect more.
+Detected gesture are not handled here
+
+@see handleGesture()
+*/
 function onFrame(frame)
 {
 	globalFrame = frame;
-	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!tempFrame || (frame.timestamp - tempFrame.timestamp > settings.frametime))) {
-    tempFrame = frame;
-		if(isConnected || true) {
+	if(frame.valid && frame.hands && frame.hands.length !== 0 && (!previousFrame || (frame.timestamp - previousFrame.timestamp > settings.frametime))) {
+    previousFrame = frame;
+		if(isConnected) {
       if(frame.hands.length >= 2) {
         twoHands(frame)
       } else if(frame.hands.length == 1) {
@@ -196,6 +249,10 @@ function onFrame(frame)
 	}
 }
 
+/**
+Used to tell if the swipe detected is valid according to the parameters.
+@see handleSwipe()
+*/
 function isWholeSwipe(start, current) {
   if(start) {
     console.log(`distance: ${current[0] - start[0]}`)
@@ -206,6 +263,12 @@ function isWholeSwipe(start, current) {
   return false;
 }
 
+/**
+Used to calculate the direction of the circle gesture.
+@param {Object} - the object containing information about the gesture
+@see handleCircle()
+@see handleGesture()
+*/
 function direction(gesture) {
   var pointableID = gesture.pointableIds[0];
   var direction = globalFrame.pointable(pointableID).direction;
@@ -214,32 +277,37 @@ function direction(gesture) {
   return (dotProduct  >  0);
 }
 
+/**
+Variable containing information whether the circle gesture is clockwise.
+@see handleCircle()
+*/
 clockwise = true;
+/**
+This function is used to handle the circle gesture
+@param {Object} - the object containing information about the gesture
+@see handleGesture() - the root caller of this function
+*/
 function handleCircle(gesture) {
   console.log(gesture.state)
   if(gesture.state == 'start') {
     clockwise = direction(gesture);
     console.log('START Circling, Clockwise:', clockwise)
   } else if(gesture.state == 'update') {
-        // pointableIds = gesture.pointableIds;
-        // pointableIds.forEach(function(pointableId) {
-        // var pointable = globalFrame.pointable(pointableId);
-        // console.log(`center: ${gesture.center}, radius: ${gesture.radius}`)
-        // console.log(pointable.stabilizedTipPosition)
-        // input = [0, pointable.tipPosition[0] - gesture.center[0], pointable.tipPosition[1] - gesture.center[1], gesture.radius]
-        // console.log(input)
         console.log('update' + globalFrame.timestamp)
         if(isConnected) {
           gSocket.emit('rotateModel', clockwise ? 0:1); //NOTE: externalized value: circle.multiplier
           console.log('emitted rotation')
-		  //console.error(`[${pointable.tipPosition[0] - gesture.center[0]}, ${pointable.tipPosition[1] - gesture.center[1]}, ${gesture.radius}]`)
 		    }
-      // });
     } else if(gesture.state == 'stop') {
       console.log('END')
     }
 }
 
+/**
+This function handles the swipe gesture
+@param {Object} - the object containing information about the gesture
+@see handleGesture() - the root caller of this function
+*/
 function handleSwipe(gesture) {
   if(gesture.state == 'start') {
     console.log('START SWIPE')
@@ -268,6 +336,10 @@ function handleSwipe(gesture) {
   }
 }
 
+/**
+This function is the first entry point for detected built-in gestures
+from the controller.
+*/
 function handleGesture(gesture) {
   if(gesture.type == 'circle' && settings.circle) {
       handleCircle(gesture);
@@ -276,6 +348,9 @@ function handleGesture(gesture) {
 		}
 }
 
+/**
+This function initializes the communication to the leap controller
+*/
 function initLeap() {
   Leap = require('leapjs');
   controller = new Leap.Controller({enableGestures: true});
@@ -284,7 +359,7 @@ function initLeap() {
   controller.on('gesture', handleGesture);
 }
 
-
+//Starting the server
 http.listen(3000, function() {
 	console.log('listening on *:3000');
 });
