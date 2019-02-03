@@ -55,7 +55,7 @@ Needed to differentiate between an explode event start and update
 */
 pullStart = false;
 /**
-Needed to prevent excpetions when not connected to client
+Needed to prevent exceptions when not connected to client
 */
 isConnected = false;
 /**
