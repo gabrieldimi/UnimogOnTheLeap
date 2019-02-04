@@ -34,9 +34,9 @@ var zRotationChange = 0.01;
 var maxExplodeValue = 1.3;
 
 //Desired volumes for scene objects
-var unimogDesiredVolume = 3000;
-var logoDesiredVolume = 2000;
-var cubeDesiredVolume = 9261;
+var unimogDesiredVolume = 3000 * 2;
+var logoDesiredVolume = 2000 *2;
+var cubeDesiredVolume = 9261 * 2;
 
 //Variables for scene objects
 var globalUnimog;
@@ -272,7 +272,7 @@ window.addEventListener('DOMContentLoaded',function(){
         globalUnimog.position.x = 0;
         globalUnimog.position.y = 0;
         globalUnimog.position.z = 0;
-        globalUnimog.rotation.x = 0;
+        globalUnimog.rotation.x = - Math.PI / 4;
         globalUnimog.rotation.y = 0;
         globalUnimog.rotation.z = 0;
         var desiredFactor = uniformScale(unimogDesiredVolume,globalUnimog);
