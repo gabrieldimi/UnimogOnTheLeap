@@ -1,8 +1,8 @@
 {
   "swipe": true,
-  "circle": false,
-  "translation": false,
-  "reset": false,
+  "circle": true,
+  "translation": true,
+  "reset": true,
   "pullApart": true,
   "frametime": 16666,
   "grabStrength": 0.5,
@@ -20,6 +20,10 @@
     },
     "circle": {
       "multiplier": 25
+    },
+    "explode": {
+      "minDistance": 100,
+      "maxDistance": 400
     }
   },
   "palmNormalThreshold": 0.9
